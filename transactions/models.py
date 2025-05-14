@@ -33,6 +33,11 @@ class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        indexes = [
+                models.Index(fields=['user', 'name', 'type', 'category', 'created_at']),
+        ]
+    
 class Budget(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     amount = models.DecimalField(
@@ -54,3 +59,6 @@ class Budget(models.Model):
     
     class Meta:
         unique_together = ('user', 'category', 'month', 'year')
+        indexes = [
+            models.Index(fields=['user', 'category', 'month', 'year'])
+        ]

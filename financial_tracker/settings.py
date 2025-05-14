@@ -143,3 +143,4 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = 1
 # allauth settings
 LOGIN_REDIRECT_URL = '/' # Where to redirect after login
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
