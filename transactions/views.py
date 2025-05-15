@@ -8,7 +8,8 @@ from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from typing import Any
-from .models import Transaction, Category, Budget
+from .models import Transaction, Category
+from budgets.models import Budget
 from .forms import TransactionForm
 
 PAGINATION_SIZE = 10

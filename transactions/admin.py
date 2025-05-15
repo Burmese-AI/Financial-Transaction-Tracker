@@ -3,4 +3,3 @@ from .models import *
 
 admin.site.register(Category)
 admin.site.register(Transaction)
-admin.site.register(Budget)

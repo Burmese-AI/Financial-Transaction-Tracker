@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_htmx',
     
     'transactions',
+    'budgets',
 ]
 
 MIDDLEWARE = [
