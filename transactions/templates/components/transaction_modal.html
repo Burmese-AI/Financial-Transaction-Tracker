@@ -1,9 +1,9 @@
 {% extends "components/base_modal.html" %}
 
 {% block modal_content %}
-<div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+<div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-xl font-semibold text-gray-900">
+    <h2 class="text-xl font-semibold text-stone-800">
       {% if transaction %}
         Edit Transaction
       {% else %}
@@ -14,7 +14,7 @@
       hx-get="{% url 'close_modal' %}"
       hx-target="#modal"
       hx-swap="outerHTML"
-      class="text-gray-400 hover:text-gray-600 focus:outline-none"
+      class="text-stone-400 hover:text-stone-600 focus:outline-none transition-colors duration-200"
     >
       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -30,7 +30,7 @@
     {% csrf_token %}
     <!-- Name Field -->
     <div>
-      <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700">Name</label>
+      <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-stone-700">Name</label>
       <div class="mt-2">
         {{ form.name }}
       </div>
@@ -43,7 +43,7 @@
 
     <!-- Description Field -->
     <div>
-      <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700">Description</label>
+      <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-stone-700">Description</label>
       <div class="mt-2">
         {{ form.description }}
       </div>
@@ -56,7 +56,7 @@
 
     <!-- Amount Field -->
     <div>
-      <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700">Amount</label>
+      <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-stone-700">Amount</label>
       <div class="mt-2">
         {{ form.amount }}
       </div>
@@ -69,7 +69,7 @@
 
     <!-- Category Field -->
     <div>
-      <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700">Category</label>
+      <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-stone-700">Category</label>
       <div class="mt-2">
         {{ form.category }}
       </div>
@@ -82,7 +82,7 @@
 
     <!-- Type Field -->
     <div>
-      <label for="{{ form.type.id_for_label }}" class="block text-sm font-medium text-gray-700">Type</label>
+      <label for="{{ form.type.id_for_label }}" class="block text-sm font-medium text-stone-700">Type</label>
       <div class="mt-2">
         {{ form.type }}
       </div>
@@ -100,13 +100,13 @@
         hx-get="{% url 'close_modal' %}"
         hx-target="#modal"
         hx-swap="outerHTML"
-        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+        class="px-4 py-2 text-sm font-medium text-stone-800 bg-stone-100 rounded-md transition-colors duration-200 transform hover:scale-105 hover:bg-stone-200 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2"
       >
         Cancel
       </button>
       <button
         type="submit"
-        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="px-4 py-2 text-sm font-medium text-stone-50 bg-amber-600 rounded-md transition-colors duration-200 transform hover:scale-105 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
       >
         Save
       </button>

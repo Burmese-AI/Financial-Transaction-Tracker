@@ -8,16 +8,16 @@
       hx-get="{% url 'dashboard' %}?page={{ page_obj.previous_page_number }}"
       hx-target="#transaction-table-container"
       hx-swap="innerHTML"
-      class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-800 bg-stone-100 rounded-full shadow-md transition-colors duration-200 transform hover:scale-105 hover:bg-amber-700 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
     >
-      <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
       </svg>
       Previous
     </a>
     {% else %}
-    <span class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-full shadow-md cursor-not-allowed">
-      <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <span class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-500 bg-stone-100 rounded-full shadow-md cursor-not-allowed">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
       </svg>
       Previous
@@ -33,7 +33,7 @@
           {% for num in page_obj.paginator.page_range %}
             {% if num >= start and num <= end and num <= page_obj.paginator.num_pages %}
               {% if page_obj.number == num %}
-                <span class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-full shadow-md">
+                <span class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-50 bg-amber-600 rounded-full shadow-md">
                   {{ num }}
                 </span>
               {% else %}
@@ -42,7 +42,7 @@
                   hx-get="{% url 'dashboard' %}?page={{ num }}"
                   hx-target="#transaction-table-container"
                   hx-swap="innerHTML"
-                  class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-800 bg-stone-100 rounded-full shadow-md transition-colors duration-200 transform hover:scale-105 hover:bg-amber-700 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
                 >
                   {{ num }}
                 </a>
@@ -57,7 +57,7 @@
               {% for num in page_obj.paginator.page_range %}
                 {% if num >= start and num <= end %}
                   {% if page_obj.number == num %}
-                    <span class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-full shadow-md">
+                    <span class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-50 bg-amber-600 rounded-full shadow-md">
                       {{ num }}
                     </span>
                   {% else %}
@@ -66,7 +66,7 @@
                       hx-get="{% url 'dashboard' %}?page={{ num }}"
                       hx-target="#transaction-table-container"
                       hx-swap="innerHTML"
-                      class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-800 bg-stone-100 rounded-full shadow-md transition-colors duration-200 transform hover:scale-105 hover:bg-amber-700 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
                     >
                       {{ num }}
                     </a>
@@ -78,7 +78,7 @@
             {% for num in page_obj.paginator.page_range %}
               {% if num >= start and num <= end %}
                 {% if page_obj.number == num %}
-                  <span class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-full shadow-md">
+                  <span class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-50 bg-amber-600 rounded-full shadow-md">
                     {{ num }}
                   </span>
                 {% else %}
@@ -87,7 +87,7 @@
                     hx-get="{% url 'dashboard' %}?page={{ num }}"
                     hx-target="#transaction-table-container"
                     hx-swap="innerHTML"
-                    class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-800 bg-stone-100 rounded-full shadow-md transition-colors duration-200 transform hover:scale-105 hover:bg-amber-700 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
                   >
                     {{ num }}
                   </a>
@@ -100,7 +100,7 @@
         {% for num in page_obj.paginator.page_range %}
           {% if num >= start and num <= end %}
             {% if page_obj.number == num %}
-              <span class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-full shadow-md">
+              <span class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-50 bg-amber-600 rounded-full shadow-md">
                 {{ num }}
               </span>
             {% else %}
@@ -109,7 +109,7 @@
                 hx-get="{% url 'dashboard' %}?page={{ num }}"
                 hx-target="#transaction-table-container"
                 hx-swap="innerHTML"
-                class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-800 bg-stone-100 rounded-full shadow-md transition-colors duration-200 transform hover:scale-105 hover:bg-amber-700 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
               >
                 {{ num }}
               </a>
@@ -120,13 +120,13 @@
 
       <!-- Ellipsis and Last Page -->
       {% if page_obj.paginator.num_pages > 5 and end < page_obj.paginator.num_pages %}
-        <span class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-500">…</span>
+        <span class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-500">…</span>
         <a
           href="?page={{ page_obj.paginator.num_pages }}"
           hx-get="{% url 'dashboard' %}?page={{ page_obj.paginator.num_pages }}"
           hx-target="#transaction-table-container"
           hx-swap="innerHTML"
-          class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-800 bg-stone-100 rounded-full shadow-md transition-colors duration-200 transform hover:scale-105 hover:bg-amber-700 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
         >
           {{ page_obj.paginator.num_pages }}
         </a>
@@ -142,17 +142,17 @@
       hx-get="{% url 'dashboard' %}?page={{ page_obj.next_page_number }}"
       hx-target="#transaction-table-container"
       hx-swap="innerHTML"
-      class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full shadow-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-800 bg-stone-100 rounded-full shadow-md transition-colors duration-200 transform hover:scale-105 hover:bg-amber-700 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
     >
       Next
-      <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
       </svg>
     </a>
     {% else %}
-    <span class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-full shadow-md cursor-not-allowed">
+    <span class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-stone-500 bg-stone-100 rounded-full shadow-md cursor-not-allowed">
       Next
-      <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
       </svg>
     </span>
