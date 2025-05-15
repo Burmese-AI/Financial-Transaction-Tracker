@@ -1,4 +1,4 @@
-
+import calendar
 from django.views.generic import ListView
 from .models import Budget
 
@@ -15,6 +15,8 @@ class BudgetsDashboardView(ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        for budget in context['budgets']:
+            budget.month_name = calendar.month_name[budget.month]
         return context
     
   
