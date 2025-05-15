@@ -1,0 +1,31 @@
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ budget.amount }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ budget.category.name }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ budget.month_name }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ budget.year }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ budget.created_at|date:"Y-m-d H:i" }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm">
+        <div class="flex space-x-2">
+          <button
+            hx-get="#"
+            hx-target="#modal-placeholder"
+            hx-swap="outerHTML"
+            class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-md hover:bg-green-300 focus:outline-none focus:ring-2 focus:ring-green-400"
+          >
+            Edit
+          </button>
+          <form
+            hx-post="#"
+            hx-swap="none"
+            class="flex-1 min-w-[100px]"
+          >
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-md hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-red-400"
+            >
+              Delete
+            </button>
+          </form>
+        </div>
+      </td>
+    </tr>
