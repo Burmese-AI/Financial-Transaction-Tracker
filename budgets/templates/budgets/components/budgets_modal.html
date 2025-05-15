@@ -22,7 +22,7 @@
     </button>
   </div>
   <form
-      hx-post=""
+      hx-post="{% url 'budget_create' %}"
       hx-swap="none"
       hx-on::after-request="if (event.detail.successful) { this.reset(); htmx.ajax('GET', '{% url 'close_modal' %}', { target: '#modal', swap: 'outerHTML' }); }"
       class="space-y-6"

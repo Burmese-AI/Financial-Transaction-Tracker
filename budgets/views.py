@@ -1,11 +1,17 @@
 import calendar
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView
 from .models import Budget
 from transactions.models import Category
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .forms import BudgetForm
+from django.core.paginator import Paginator
+from typing import Any
+from django.contrib import messages
+
+
+
 PAGINATION_SIZE = 10
 # Create your views here.
 class BudgetsDashboardView(ListView):
@@ -50,6 +56,49 @@ class BudgetsDashboardView(ListView):
             return HttpResponse(html)
         return super().render_to_response(context, **response_kwargs)
   
+class BudgetCreateView(CreateView):
+    model = Budget
+    form_class = BudgetForm
+    template_name = "budgets/partials/budgets_table.html"
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
+        return self.render_to_response(self.get_context_data())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # To render the whole transaction tabel, paginated transactions are required  
+        budgets = Budget.objects.filter(user=self.request.user)
+        paginator = Paginator(budgets, PAGINATION_SIZE)
+        page_obj = paginator.get_page(1)
+        # Merge the existing context dict with the new one
+        context.update({
+            "page_obj": page_obj,
+            "paginator": paginator,
+            "budgets": page_obj.object_list,
+            "is_paginated": paginator.num_pages > 1,
+        })
+
+        return context
+
+    def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
+        messages.success(self.request, "Budget added successfully!")
+        if self.request.headers.get('Hx-Request') == 'true':
+            # htmx-oob is used to update multiple elements (table and messages) which are not in the same container  
+            context['is_oob'] = True
+            table_html = render_to_string("budgets/partials/budgets_table.html", context, request=self.request)
+            message_html = render_to_string("budgets/components/messages.html", context, request=self.request)
+            return HttpResponse(f"{table_html}{message_html}")
+
+        return super().render_to_response(context)
+
+
+
+
+
+
 
 def open_budget_create_modal(request):
     form = BudgetForm()
