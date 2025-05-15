@@ -1,0 +1,28 @@
+<tr>
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transaction.name }}</td>
+  <td class="px-6 py-4 text-sm text-gray-500 max-w-xs text-ellipsis overflow-hidden">{{ transaction.description|default:"-" }}</td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm {% if transaction.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
+    {% if transaction.type == 'income' %}+ {% else %}− {% endif %}{{ transaction.amount }}
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.category.name }}</td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm">
+    <span class="inline-block px-2 py-1 text-xs font-medium rounded-full {% if transaction.type == 'income' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+      {{ transaction.type|capfirst }}
+    </span>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ transaction.created_at|date:"Y-m-d H:i" }}</td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm">
+    <div class="flex space-x-2">
+      <button
+        class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-md hover:bg-green-300 focus:outline-none focus:ring-2 focus:ring-green-400"
+      >
+        Edit
+      </button>
+      <button
+        class="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-md hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-red-400"
+      >
+        Delete
+      </button>
+    </div>
+  </td>
+</tr>

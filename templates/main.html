@@ -6,11 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{% static 'styles/output.css' %}">
     <script src="{% static 'vendors/htmx/htmx.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'vendors/toastify/toastify.css' %}">
+    <script src="{% static 'vendors/toastify/toastify.js' %}"></script>
   </head>
   <body>
-    {% include "navbar.html" %}
-    {% block content %}
-    {% endblock content %}
+    {% include "components/navbar.html" %}
+    {% include "components/modal_placeholder.html" %}
+    {% include "components/messages.html" %}
+    {% block content %}{% endblock content %}
   </body>
 </html>
 

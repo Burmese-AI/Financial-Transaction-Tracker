@@ -1,0 +1,23 @@
+{% extends "main.html" %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+  <!-- Title and Add Button -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-semibold text-gray-900">Transactions</h1>
+    <button
+      hx-get="{% url 'transaction_create_modal' %}"
+      hx-target="#modal-placeholder"
+      hx-swap="outerHTML"
+      class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    >
+      Add Transaction
+    </button>
+  </div>
+
+  <!-- Transaction Table and Pagination -->
+  <div id="transaction-table-container" class="overflow-x-auto">
+    {% include "partials/transaction_table.html" %}
+  </div>
+</div>
+{% endblock content %}

@@ -40,11 +40,13 @@ INSTALLED_APPS = [
     
     'allauth',
     'allauth.account',
+    'django_htmx',
     
     'transactions',
 ]
 
 MIDDLEWARE = [
+    "django_htmx.middleware.HtmxMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

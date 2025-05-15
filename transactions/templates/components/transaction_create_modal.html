@@ -1,0 +1,110 @@
+{% extends "components/base_modal.html" %}
+
+{% block modal_content %}
+<div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-xl font-semibold text-gray-900">Add Transaction</h2>
+    <button
+      hx-get="{% url 'close_modal' %}"
+      hx-target="#modal"
+      hx-swap="outerHTML"
+      class="text-gray-400 hover:text-gray-600 focus:outline-none"
+    >
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+  <form
+      hx-post="{% url 'transaction_create' %}"
+      hx-swap="none"
+      hx-on::after-request="if (event.detail.successful) { this.reset(); htmx.ajax('GET', '{% url 'close_modal' %}', { target: '#modal', swap: 'outerHTML' }); }"
+      class="space-y-6"
+  >
+    {% csrf_token %}
+    <!-- Name Field -->
+    <div>
+      <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700">Name</label>
+      <div class="mt-2">
+        {{ form.name }}
+      </div>
+      {% if form.name.errors %}
+        {% for error in form.name.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Description Field -->
+    <div>
+      <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700">Description</label>
+      <div class="mt-2">
+        {{ form.description }}
+      </div>
+      {% if form.description.errors %}
+        {% for error in form.description.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Amount Field -->
+    <div>
+      <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700">Amount</label>
+      <div class="mt-2">
+        {{ form.amount }}
+      </div>
+      {% if form.amount.errors %}
+        {% for error in form.amount.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Category Field -->
+    <div>
+      <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700">Category</label>
+      <div class="mt-2">
+        {{ form.category }}
+      </div>
+      {% if form.category.errors %}
+        {% for error in form.category.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Type Field -->
+    <div>
+      <label for="{{ form.type.id_for_label }}" class="block text-sm font-medium text-gray-700">Type</label>
+      <div class="mt-2">
+        {{ form.type }}
+      </div>
+      {% if form.type.errors %}
+        {% for error in form.type.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end space-x-2 pt-4">
+      <button
+        type="button"
+        hx-get="{% url 'close_modal' %}"
+        hx-target="#modal"
+        hx-swap="outerHTML"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        Save
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock modal_content %}
