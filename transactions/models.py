@@ -4,6 +4,14 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from uuid import uuid4
 from datetime import datetime
 
+def current_month():
+    return datetime.now().month
+
+def current_year():
+    return datetime.now().year
+
+
+
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
@@ -52,11 +60,11 @@ class Budget(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='budgets')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     month = models.PositiveSmallIntegerField(
-        default=datetime.now().month, 
+        default=current_month, 
         validators=[MinValueValidator(1), MaxValueValidator(12)]
     )
     year = models.PositiveIntegerField(
-        default=datetime.now().year
+        default=current_year
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -66,3 +74,7 @@ class Budget(models.Model):
         indexes = [
             models.Index(fields=['user', 'category', 'month', 'year'])
         ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.category.name} ({self.month}/{self.year}): {self.amount}"
+
