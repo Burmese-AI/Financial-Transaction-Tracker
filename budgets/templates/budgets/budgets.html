@@ -15,6 +15,43 @@
     </button>
   </div>
 
+  <!-- Filter Form -->
+  <form
+    hx-get="{% url 'budgets_dashboard' %}"
+    hx-target="#budget-table-container"
+    hx-push-url="true"
+    hx-trigger="change delay:200ms, keyup delay:400ms from:input"
+    class="mb-6 flex flex-wrap gap-4 items-end bg-stone-50 p-4 rounded-lg shadow-sm"
+  >
+    <div>
+      <label for="category" class="block text-xs font-medium text-stone-700 mb-1">Category</label>
+      <select name="category" id="category" class="block w-40 rounded-md border-stone-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm">
+        <option value="">All</option>
+        {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:'s' %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="month" class="block text-xs font-medium text-stone-700 mb-1">Month</label>
+      <select name="month" id="month" class="block w-32 rounded-md border-stone-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm">
+        <option value="">All</option>
+        {% for num, name in months %}
+          <option value="{{ num }}" {% if selected_month == num|stringformat:'s' %}selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="year" class="block text-xs font-medium text-stone-700 mb-1">Year</label>
+      <select name="year" id="year" class="block w-28 rounded-md border-stone-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm">
+        <option value="">All</option>
+        {% for y in years %}
+          <option value="{{ y }}" {% if selected_year == y|stringformat:'s' %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+
   <!-- Budget Table and Pagination -->
   <div id="budget-table-container" class="overflow-x-auto">
     {% include "budgets/partials/budgets_table.html" %}
