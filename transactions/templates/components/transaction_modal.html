@@ -3,7 +3,13 @@
 {% block modal_content %}
 <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-xl font-semibold text-gray-900">Add Transaction</h2>
+    <h2 class="text-xl font-semibold text-gray-900">
+      {% if transaction %}
+        Edit Transaction
+      {% else %}
+        Add Transaction
+      {% endif %}
+    </h2>
     <button
       hx-get="{% url 'close_modal' %}"
       hx-target="#modal"
@@ -16,7 +22,7 @@
     </button>
   </div>
   <form
-      hx-post="{% url 'transaction_create' %}"
+      hx-post="{% if transaction %}{% url 'transaction_update' transaction.id %}{% else %}{% url 'transaction_create' %}{% endif %}"
       hx-swap="none"
       hx-on::after-request="if (event.detail.successful) { this.reset(); htmx.ajax('GET', '{% url 'close_modal' %}', { target: '#modal', swap: 'outerHTML' }); }"
       class="space-y-6"

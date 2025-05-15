@@ -1,4 +1,4 @@
-<tr>
+<tr {% if is_oob %}hx-swap-oob="true"{% endif %} id="transaction-{{ transaction.id}}">
   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transaction.name }}</td>
   <td class="px-6 py-4 text-sm text-gray-500 max-w-xs text-ellipsis overflow-hidden">{{ transaction.description|default:"-" }}</td>
   <td class="px-6 py-4 whitespace-nowrap text-sm {% if transaction.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
@@ -14,6 +14,9 @@
   <td class="px-6 py-4 whitespace-nowrap text-sm">
     <div class="flex space-x-2">
       <button
+        hx-get="{% url 'transaction_update_modal' transaction.id %}"
+        hx-target="#modal-placeholder"
+        hx-swap="outerHTML"
         class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-md hover:bg-green-300 focus:outline-none focus:ring-2 focus:ring-green-400"
       >
         Edit
