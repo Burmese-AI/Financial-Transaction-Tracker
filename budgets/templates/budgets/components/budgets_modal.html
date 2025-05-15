@@ -1,0 +1,9 @@
+{% extends "components/base_modal.html" %}
+
+{% block modal_content %}
+<form>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+{% endblock modal_content %}

@@ -4,7 +4,8 @@ from .models import Budget
 from transactions.models import Category
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-
+from django.shortcuts import render, get_object_or_404
+from .forms import BudgetForm
 PAGINATION_SIZE = 10
 # Create your views here.
 class BudgetsDashboardView(ListView):
@@ -49,3 +50,24 @@ class BudgetsDashboardView(ListView):
             return HttpResponse(html)
         return super().render_to_response(context, **response_kwargs)
   
+
+def open_budget_create_modal(request):
+    form = BudgetForm()
+    context = {
+        'form': form,
+        'budget': None,  # Explicitly pass None for create
+    }
+    return render(request, "budgets/components/budgets_modal.html", context=context)
+
+def open_budget_update_modal(request, pk):
+    budget = get_object_or_404(Budget, pk=pk, user=request.user)  # Ensure user owns the budget
+    form = BudgetForm(instance=budget)
+    context = {
+        'form': form,
+        'budget': budget,  # Pass the budget for update
+    }
+    return render(request, "budgets/components/budgets_modal.html", context=context)
+    
+def close_modal(request):
+    return render(request, "budgets/components/modal_placeholder.html")
+    
