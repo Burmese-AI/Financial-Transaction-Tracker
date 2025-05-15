@@ -12,6 +12,7 @@
   "description": "",
   "dependencies": {
     "@tailwindcss/cli": "^4.1.6",
-    "tailwindcss": "^4.1.6"
+    "tailwindcss": "^4.1.6",
+    "toastify-js": "^1.12.0"
   }
 }

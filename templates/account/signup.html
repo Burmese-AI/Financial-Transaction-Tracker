@@ -1,0 +1,128 @@
+{% extends "account/auth_base.html" %}
+
+{% load i18n %}
+
+{% block title %}Sign Up - FinTrack{% endblock title %}
+
+{% block content %}
+<div class="bg-white rounded-xl shadow-lg p-6 border border-stone-200 max-w-md w-full">
+  <h2 class="text-2xl font-semibold text-stone-800 mb-6 text-center">Sign Up for FinTrack</h2>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-amber-100 text-amber-800{% endif %}" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="POST" action="{% url 'account_signup' %}" class="space-y-6">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      {% for error in form.non_field_errors %}
+        <p class="text-sm text-red-600">{{ error }}</p>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Email -->
+    <div>
+      <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-stone-700">Email</label>
+      <div class="mt-2">
+        <input
+          type="email"
+          name="email"
+          id="{{ form.email.id_for_label }}"
+          value="{{ form.email.value|default_if_none:'' }}"
+          class="outline-none w-full py-2 text-stone-800 placeholder-stone-500 bg-transparent border-b-2 border-stone-300 hover:border-stone-400 focus:border-amber-500 active:border-amber-600 focus:ring-0 transition-colors duration-200"
+          placeholder="Enter your email"
+          required
+        >
+      </div>
+      {% if form.email.errors %}
+        {% for error in form.email.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Username (Optional) -->
+    {% if form.username %}
+      <div>
+        <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-stone-700">Username</label>
+        <div class="mt-2">
+          <input
+            type="text"
+            name="username"
+            id="{{ form.username.id_for_label }}"
+            value="{{ form.username.value|default_if_none:'' }}"
+            class="outline-none w-full py-2 text-stone-800 placeholder-stone-500 bg-transparent border-b-2 border-stone-300 hover:border-stone-400 focus:border-amber-500 active:border-amber-600 focus:ring-0 transition-colors duration-200"
+            placeholder="Enter your username"
+            {% if form.username.field.required %}required{% endif %}
+          >
+        </div>
+        {% if form.username.errors %}
+          {% for error in form.username.errors %}
+            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+          {% endfor %}
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <!-- Password -->
+    <div>
+      <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-stone-700">Password</label>
+      <div class="mt-2">
+        <input
+          type="password"
+          name="password1"
+          id="{{ form.password1.id_for_label }}"
+          class="outline-none w-full py-2 text-stone-800 placeholder-stone-500 bg-transparent border-b-2 border-stone-300 hover:border-stone-400 focus:border-amber-500 active:border-amber-600 focus:ring-0 transition-colors duration-200"
+          placeholder="Enter your password"
+          required
+        >
+      </div>
+      {% if form.password1.errors %}
+        {% for error in form.password1.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Password Confirmation -->
+    <div>
+      <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-stone-700">Confirm Password</label>
+      <div class="mt-2">
+        <input
+          type="password"
+          name="password2"
+          id="{{ form.password2.id_for_label }}"
+          class="outline-none w-full py-2 text-stone-800 placeholder-stone-500 bg-transparent border-b-2 border-stone-300 hover:border-stone-400 focus:border-amber-500 active:border-amber-600 focus:ring-0 transition-colors duration-200"
+          placeholder="Confirm your password"
+          required
+        >
+      </div>
+      {% if form.password2.errors %}
+        {% for error in form.password2.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Sign Up Button -->
+    <div>
+      <button
+        type="submit"
+        class="w-full px-4 py-2 text-sm font-medium text-stone-50 bg-amber-600 rounded-md transition-colors duration-200 transform hover:scale-105 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+        aria-label="Sign up"
+      >
+        Sign Up
+      </button>
+    </div>
+
+    <!-- Login Link -->
+    <div class="text-center">
+      <p class="text-sm text-stone-500">Already have an account? <a href="{% url 'account_login' %}" class="text-amber-600 hover:text-amber-700">Log In</a></p>
+    </div>
+  </form>
+</div>
+{% endblock content %}

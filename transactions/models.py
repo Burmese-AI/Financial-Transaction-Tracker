@@ -7,6 +7,9 @@ from datetime import datetime
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
+    
+    def __str__(self) -> str:
+        return self.name
 
 class Transaction(models.Model):
     
@@ -37,6 +40,7 @@ class Transaction(models.Model):
         indexes = [
                 models.Index(fields=['user', 'name', 'type', 'category', 'created_at']),
         ]
+        ordering = ['-created_at']
     
 class Budget(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
