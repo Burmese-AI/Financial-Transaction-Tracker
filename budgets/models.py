@@ -37,6 +37,7 @@ class Budget(models.Model):
         indexes = [
             models.Index(fields=['user', 'category', 'month', 'year'])
         ]
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.user.username} - {self.category.name} ({self.month}/{self.year}): {self.amount}"

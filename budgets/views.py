@@ -68,19 +68,18 @@ class BudgetCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # To render the whole transaction tabel, paginated transactions are required  
         budgets = Budget.objects.filter(user=self.request.user)
-        years = Budget.objects.filter(user=self.request.user).values_list('year', flat=True).distinct().order_by('-year')
         paginator = Paginator(budgets, PAGINATION_SIZE)
         page_obj = paginator.get_page(1)
-        # Merge the existing context dict with the new one
         context.update({
             "page_obj": page_obj,
             "paginator": paginator,
             "budgets": page_obj.object_list,
             "is_paginated": paginator.num_pages > 1,
         })
-
+        # Add month_name to each budget
+        for budget in context['budgets']:
+            budget.month_name = calendar.month_name[budget.month]
         return context
 
     def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
