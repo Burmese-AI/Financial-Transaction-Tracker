@@ -33,9 +33,9 @@
     </button>
   </div>
   <form
-      hx-post="{% url 'budget_create' %}"
-      hx-target="#modal"
-      hx-swap="outerHTML"
+      hx-post=""
+      hx-swap="none"
+      hx-on::after-request="if (event.detail.successful) { this.reset(); htmx.ajax('GET', '{% url 'close_modal' %}', { target: '#modal', swap: 'outerHTML' }); }"
       class="space-y-6"
   >
     {% csrf_token %}
