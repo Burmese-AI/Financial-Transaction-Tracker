@@ -1,9 +1,9 @@
-<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ budget.amount }}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ budget.category.name }}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ budget.month_name }}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ budget.year }}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ budget.created_at|date:"Y-m-d H:i" }}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 overflow-hidden overflow-ellipsis">{{ budget.amount }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 overflow-hidden overflow-ellipsis">{{ budget.category.name }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 overflow-hidden overflow-ellipsis">{{ budget.month_name }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 overflow-hidden overflow-ellipsis">{{ budget.year }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 overflow-hidden overflow-ellipsis">{{ budget.created_at|date:"Y-m-d H:i" }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm overflow-hidden overflow-ellipsis">
         <div class="flex space-x-2">
           <button
             hx-get="#"
