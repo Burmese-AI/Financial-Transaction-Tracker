@@ -70,8 +70,7 @@ class BudgetCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         # To render the whole transaction tabel, paginated transactions are required  
         budgets = Budget.objects.filter(user=self.request.user)
-        total_budget_limit = sum(budget.amount for budget in budgets)
-        count = budgets.count()
+        years = Budget.objects.filter(user=self.request.user).values_list('year', flat=True).distinct().order_by('-year')
         paginator = Paginator(budgets, PAGINATION_SIZE)
         page_obj = paginator.get_page(1)
         # Merge the existing context dict with the new one
@@ -80,8 +79,6 @@ class BudgetCreateView(CreateView):
             "paginator": paginator,
             "budgets": page_obj.object_list,
             "is_paginated": paginator.num_pages > 1,
-            "total_budget_limit": total_budget_limit,
-            "count": count,
         })
 
         return context
