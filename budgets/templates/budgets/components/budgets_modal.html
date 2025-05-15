@@ -2,9 +2,20 @@
 
 {% block modal_content %}
 <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+  <!-- Messages Section -->
+  {% if messages %}
+  <div class="mb-4">
+    {% for message in messages %}
+    <div class="p-4 mb-4 rounded-md {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-xl font-semibold text-stone-800">
-      {% if budgets %}
+      {% if budget %}
         Edit Budget
       {% else %}
         Add Budget
@@ -23,11 +34,20 @@
   </div>
   <form
       hx-post="{% url 'budget_create' %}"
-      hx-swap="none"
-      hx-on::after-request="if (event.detail.successful) { this.reset(); htmx.ajax('GET', '{% url 'close_modal' %}', { target: '#modal', swap: 'outerHTML' }); }"
+      hx-target="#modal"
+      hx-swap="outerHTML"
       class="space-y-6"
   >
     {% csrf_token %}
+
+    <!-- Non-field errors -->
+    {% if form.non_field_errors %}
+    <div class="p-4 mb-4 rounded-md bg-red-100 text-red-700">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Amount Field -->
     <div>

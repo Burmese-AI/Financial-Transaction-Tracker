@@ -62,37 +62,59 @@ class BudgetCreateView(CreateView):
     template_name = "budgets/partials/budgets_table.html"
 
     def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.user = self.request.user
-        self.object.save()
-        return self.render_to_response(self.get_context_data())
+        try:
+            self.object = form.save(commit=False)
+            self.object.user = self.request.user
+            self.object.save()
+            messages.success(self.request, "Budget added successfully!")
+            return self.render_to_response(self.get_context_data())
+        except Exception as e:
+            messages.error(self.request, f"Error creating budget: {str(e)}")
+            return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        try:
+            context = self.get_context_data(form=form)
+            if self.request.headers.get('Hx-Request') == 'true':
+                # Render the modal with form errors
+                modal_html = render_to_string("budgets/components/budgets_modal.html", context, request=self.request)
+                return HttpResponse(modal_html)
+            return super().form_invalid(form)
+        except Exception as e:
+            messages.error(self.request, f"Error processing form: {str(e)}")
+            return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # To render the whole transaction tabel, paginated transactions are required  
-        budgets = Budget.objects.filter(user=self.request.user)
-        paginator = Paginator(budgets, PAGINATION_SIZE)
-        page_obj = paginator.get_page(1)
-        # Merge the existing context dict with the new one
-        context.update({
-            "page_obj": page_obj,
-            "paginator": paginator,
-            "budgets": page_obj.object_list,
-            "is_paginated": paginator.num_pages > 1,
-        })
-
-        return context
+        try:
+            context = super().get_context_data(**kwargs)
+            # To render the whole transaction tabel, paginated transactions are required  
+            budgets = Budget.objects.filter(user=self.request.user)
+            paginator = Paginator(budgets, PAGINATION_SIZE)
+            page_obj = paginator.get_page(1)
+            # Merge the existing context dict with the new one
+            context.update({
+                "page_obj": page_obj,
+                "paginator": paginator,
+                "budgets": page_obj.object_list,
+                "is_paginated": paginator.num_pages > 1,
+            })
+            return context
+        except Exception as e:
+            messages.error(self.request, f"Error loading context: {str(e)}")
+            return super().get_context_data(**kwargs)
 
     def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
-        messages.success(self.request, "Budget added successfully!")
-        if self.request.headers.get('Hx-Request') == 'true':
-            # htmx-oob is used to update multiple elements (table and messages) which are not in the same container  
-            context['is_oob'] = True
-            table_html = render_to_string("budgets/partials/budgets_table.html", context, request=self.request)
-            message_html = render_to_string("budgets/components/messages.html", context, request=self.request)
-            return HttpResponse(f"{table_html}{message_html}")
-
-        return super().render_to_response(context)
+        try:
+            if self.request.headers.get('Hx-Request') == 'true':
+                # htmx-oob is used to update multiple elements (table and messages) which are not in the same container  
+                context['is_oob'] = True
+                table_html = render_to_string("budgets/partials/budgets_table.html", context, request=self.request)
+                message_html = render_to_string("budgets/components/messages.html", context, request=self.request)
+                return HttpResponse(f"{table_html}{message_html}")
+            return super().render_to_response(context, **response_kwargs)
+        except Exception as e:
+            messages.error(self.request, f"Error rendering response: {str(e)}")
+            return super().render_to_response(context, **response_kwargs)
 
 
 
