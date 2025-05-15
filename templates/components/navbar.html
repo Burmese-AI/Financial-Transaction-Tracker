@@ -11,26 +11,29 @@
         <div class="hidden md:flex md:ml-10 md:items-baseline md:space-x-4">
           <a
             href="/"
-            class="text-stone-100 bg-amber-900 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 transform hover:scale-105 hover:bg-amber-900 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
-            aria-current="page"
+            class="{% if request.path == '/' %}text-stone-100 bg-amber-900{% else %}text-stone-300{% endif %} rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 transform hover:scale-105 hover:bg-amber-900 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+            aria-current="{% if request.path == '/' %}page{% endif %}"
           >
             Home
           </a>
           <a
-            href="/transactions"
-            class="text-stone-300 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 transform hover:scale-105 hover:bg-amber-900 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+            href="/budgets"
+            class="{% if request.path|slice:":8" == "/budgets" %}text-stone-100 bg-amber-900{% else %}text-stone-300{% endif %} rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 transform hover:scale-105 hover:bg-amber-900 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+            aria-current="{% if request.path|slice:":8" == "/budgets" %}page{% endif %}"
           >
-            Transactions
+            Budgets
           </a>
           <a
             href="#"
-            class="text-stone-300 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 transform hover:scale-105 hover:bg-amber-900 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+            class="{% if request.path == '/reports' %}text-stone-100 bg-amber-900{% else %}text-stone-300{% endif %} rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 transform hover:scale-105 hover:bg-amber-900 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+            aria-current="{% if request.path == '/reports' %}page{% endif %}"
           >
             Reports
           </a>
           <a
             href="#"
-            class="text-stone-300 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 transform hover:scale-105 hover:bg-amber-900 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+            class="{% if request.path == '/settings' %}text-stone-100 bg-amber-900{% else %}text-stone-300{% endif %} rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 transform hover:scale-105 hover:bg-amber-900 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+            aria-current="{% if request.path == '/settings' %}page{% endif %}"
           >
             Settings
           </a>
@@ -87,19 +90,19 @@
         Home
       </a>
       <a
-        href="/transactions"
+        href="/budgets"
         class="text-stone-300 block rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 hover:bg-amber-900 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
       >
-        Transactions
+        Budgets
       </a>
       <a
-        href="#"
+        href="/reports"
         class="text-stone-300 block rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 hover:bg-amber-900 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
       >
         Reports
       </a>
       <a
-        href="#"
+        href="/settings"
         class="text-stone-300 block rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 hover:bg-amber-900 hover:text-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
       >
         Settings
