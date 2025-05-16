@@ -241,13 +241,6 @@ def importcsv(request):
             )
 
             count += 1
-        
-        context = {
-           "transactions": Transaction.objects.all() ,
-           "is_oob": True
-        }
-
-        
         return redirect('dashboard')
 
 def exportcsv(request):
