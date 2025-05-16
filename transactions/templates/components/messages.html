@@ -8,7 +8,14 @@
         gravity: "top",
         position: "right",
         stopOnFocus: true,
-        className: "text-sm font-medium text-white px-4 py-2 rounded-md shadow-md z-50 {% if message.tags == 'success' %}bg-green-600{% endif %}{% if message.tags == 'error' %}bg-red-600{% endif %}{% if message.tags == 'warning' %}bg-yellow-600{% endif %}{% if message.tags == 'info' %}bg-blue-600{% endif %}{% if message.tags == 'debug' %}bg-gray-600{% endif %}",
+        className: "text-sm font-medium text-white px-4 py-2 rounded-md shadow-md z-50",
+        style: {
+          {% if message.tags == 'success' %}background: '#059669',{% endif %}
+          {% if message.tags == 'error' %}background: '#dc2626',{% endif %}
+          {% if message.tags == 'warning' %}background: '#ca8a04',{% endif %}
+          {% if message.tags == 'info' %}background: '#2563eb',{% endif %}
+          {% if message.tags == 'debug' %}background: '#6b7280',{% endif %}
+        },
         escapeMarkup: false,
       }).showToast();
     {% endfor %}
