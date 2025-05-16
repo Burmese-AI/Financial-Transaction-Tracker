@@ -15,6 +15,8 @@ from transactions.models import Transaction
 from transactions.forms import TransactionForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import DeleteView
+from django.db.models import Sum
+from django.db.models.functions import ExtractMonth, ExtractYear
 
 PAGINATION_SIZE = 10
 # Create your views here.
@@ -44,6 +46,19 @@ class BudgetsDashboardView(ListView):
         context = super().get_context_data(**kwargs)
         for budget in context['budgets']:
             budget.month_name = calendar.month_name[budget.month]
+            # Calculate total expenses for this budget's category, month, year, and user
+            expense = Transaction.objects.filter(
+                user=budget.user,
+                category=budget.category,
+                type='expense'
+            ).annotate(
+                txn_month=ExtractMonth('created_at'),
+                txn_year=ExtractYear('created_at')
+            ).filter(
+                txn_month=budget.month,
+                txn_year=budget.year
+            ).aggregate(total=Sum('amount'))['total'] or 0
+            budget.expense = expense
         # Add filter options
         context['categories'] = Category.objects.all()
         context['months'] = [(i, calendar.month_name[i]) for i in range(1, 13)]
