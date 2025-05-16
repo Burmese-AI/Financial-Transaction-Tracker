@@ -64,7 +64,8 @@ class BudgetsDashboardView(ListView):
         if self.request.htmx or self.request.headers.get('Hx-Request') == 'true':
             context['is_oob'] = True
             table_html = render_to_string('budgets/partials/budgets_table.html', context, request=self.request)
-            message_html = render_to_string('budgets/components/messages.html', context, request=self.request)
+            message_html = render_to_string('budgets/components/budgets_message.html', context, request=self.request)
+            
             return HttpResponse(f"{table_html}{message_html}")
         return super().render_to_response(context, **response_kwargs)
   
@@ -137,7 +138,7 @@ class BudgetCreateView(CreateView):
                 budget.expense = get_expense_for_budget(budget.user, budget.category, budget.month, budget.year)
                 if budget.expense > budget.amount:
                     print("DEBUG: Adding warning for", budget.category.name)
-                    messages.warning(
+                    messages.error(
                     self.request,
                     f"Warning: Your expenses for '{budget.category.name}' in {budget.month_name} {budget.year} (${budget.expense:.2f}) have exceeded your budget (${budget.amount:.2f})."
                 )
