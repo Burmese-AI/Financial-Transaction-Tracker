@@ -32,6 +32,7 @@ class TransactionListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
+        context['types'] = [value for value, label in Transaction.TRANSACTION_TYPES]
         return context
     
     def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
@@ -178,13 +179,17 @@ class TransactionSortView(LoginRequiredMixin, ListView):
             transactions = Transaction.objects.all().order_by('-amount')
         return transactions
 
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         next_sort= 'desc' if self.current_sort_direction == 'asc' else 'asc'
         context['sort_direction'] = next_sort
         return context
+    
+    def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
+        if self.request.htmx:
+            return render(self.request, "partials/transaction_table.html", context)
+        return super().render_to_response(context, **response_kwargs)
 
 class TransactionFilterView(LoginRequiredMixin, ListView):
     model = Transaction
