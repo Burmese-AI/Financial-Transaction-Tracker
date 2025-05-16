@@ -13,6 +13,9 @@ from django.core.paginator import Paginator
 from typing import Any
 from transactions.models import Transaction
 from transactions.forms import TransactionForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.edit import DeleteView
+
 PAGINATION_SIZE = 10
 # Create your views here.
 class BudgetsDashboardView(ListView):
@@ -139,6 +142,50 @@ class BudgetCreateView(CreateView):
             messages.error(self.request, "An error occurred while updating the page. Please refresh and try again.")
             return super().render_to_response(context)
 
+
+
+class BudgetDeleteView(LoginRequiredMixin, DeleteView):
+    model = Budget
+    template_name = "budgets/partials/budgets_table.html"
+    success_url = reverse_lazy('budgets')
+    
+    def get_queryset(self):
+        # Ensuring User can only update their own transactions
+        return Budget.objects.filter(user=self.request.user)
+    
+    # DeleteView doesn't utilize render_to_response like other views due to success_url, 
+    # So, override the form_valid method where deletion occurs and change the return
+    def form_valid(self, form):
+        self.object = self.get_object()
+        self.object.delete()
+        return self.render_to_response(self.get_context_data())
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # To render the whole transaction tabel, paginated transactions are required  
+        budgets = Budget.objects.filter(user=self.request.user)
+        paginator = Paginator(budgets, PAGINATION_SIZE)
+        page_obj = paginator.get_page(1)
+        # Merge the existing context dict with the new one
+        context.update({
+            "page_obj": page_obj,
+            "paginator": paginator,
+            "budgets": page_obj.object_list,
+            "is_paginated": paginator.num_pages > 1,
+        })
+
+        return context
+
+    def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
+        messages.success(self.request, "Budget deleted successfully!")
+        if self.request.htmx:
+            # htmx-oob is used to update multiple elements (table and messages) which are not in the same container  
+            context['is_oob'] = True
+            table_html = render_to_string("budgets/partials/budgets_table.html", context, request=self.request)
+            message_html = render_to_string("budgets/components/messages.html", context, request=self.request)
+            return HttpResponse(f"{table_html}{message_html}")
+
+        return super().render_to_response(context)
 
 def open_budget_create_modal(request):
     form = BudgetForm()

@@ -14,7 +14,7 @@
             Edit
           </button>
           <form
-            hx-post="#"
+            hx-post="{% url 'budget_delete' budget.pk %}"
             hx-swap="none"
             class="flex-1 min-w-[100px]"
           >
