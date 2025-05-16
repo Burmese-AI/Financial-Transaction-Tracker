@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
+from django.db.models import Q # For combining queries
 from typing import Any
 from .models import Transaction, Category
 from .forms import TransactionForm
@@ -29,6 +30,7 @@ class TransactionListView(LoginRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
         return context
     
     def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
@@ -77,7 +79,7 @@ class TransactionCreateView(CreateView):
 class TransactionUpdateView(LoginRequiredMixin, UpdateView):
     model = Transaction
     form_class = TransactionForm
-    template_name = "partials/transaction_table.html"
+    template_name = "partials/transaction_row.html"
     
     def get_queryset(self):
         # Ensuring User can only update their own transactions
@@ -146,7 +148,57 @@ class TransactionDeleteView(LoginRequiredMixin, DeleteView):
 
         return super().render_to_response(context)
 
-   
+class TransactionSearchView(LoginRequiredMixin, ListView):
+    model = Transaction
+    template_name = "partials/transaction_table.html"
+    success_url = reverse_lazy("dashboard")
+    context_object_name = "transactions"
+    paginate_by = PAGINATION_SIZE
+
+    def get_queryset(self):
+        query = self.request.GET.get('search')
+        if query:
+            return Transaction.objects.filter(Q(name__contains=query) | Q(description__contains=query))
+        return Transaction.objects.all()
+
+class TransactionSortView(LoginRequiredMixin, ListView):
+    model = Transaction
+    template_name = "partials/transaction_table.html"
+    success_url = reverse_lazy("dashboard")
+    context_object_name = "transactions"
+    paginate_by = PAGINATION_SIZE
+
+    def get_queryset(self):
+        sort_direction = self.request.GET.get('sort_direction', 'asc')
+        self.current_sort_direction = sort_direction
+        if sort_direction == 'asc':
+            transactions = Transaction.objects.all().order_by('amount')
+        else:
+            transactions = Transaction.objects.all().order_by('-amount')
+        return transactions
+
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        next_sort= 'desc' if self.current_sort_direction == 'asc' else 'asc'
+        context['sort_direction'] = next_sort
+        return context
+
+class TransactionFilterView(LoginRequiredMixin, ListView):
+    model = Transaction
+    template_name = "partials/transaction_table.html"
+    success_url = reverse_lazy("dashboard")
+    context_object_name = "transactions"
+    paginate_by = PAGINATION_SIZE
+    
+    def get_queryset(self):
+        category = self.request.GET.get('category', 'all')
+        print(category)
+        if category:
+            return Transaction.objects.filter(category__name=category)
+        return Transaction.objects.all()
+
 def open_transaction_create_modal(request):
     form = TransactionForm()
     context = {
@@ -166,7 +218,6 @@ def open_transaction_update_modal(request, pk):
     
 def close_modal(request):
     return render(request, "components/modal_placeholder.html")
-    
     
 @login_required
 def reports_view(request):
@@ -322,4 +373,3 @@ def reports_view(request):
     }
     
     return render(request, 'transactions/reports.html', context)
-
