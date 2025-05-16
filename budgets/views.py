@@ -61,37 +61,57 @@ class BudgetCreateView(CreateView):
     template_name = "budgets/partials/budgets_table.html"
 
     def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.user = self.request.user
-        self.object.save()
-        return self.render_to_response(self.get_context_data())
+        try:
+            self.object = form.save(commit=False)
+            self.object.user = self.request.user
+            self.object.save()
+            messages.success(self.request, "Budget added successfully")
+            return self.render_to_response(self.get_context_data())
+        except Exception as e:
+            messages.error(self.request, f"Error creating budget: {str(e)}")
+            return self.render_to_response(self.get_context_data(form=form))
+
+    def form_invalid(self, form):
+        try:
+            messages.error(self.request, "Please correct the errors below.")
+            return self.render_to_response(self.get_context_data(form=form))
+        except Exception as e:
+            messages.error(self.request, f"Error processing form: {str(e)}")
+            return self.render_to_response(self.get_context_data(form=form))
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        budgets = Budget.objects.filter(user=self.request.user)
-        paginator = Paginator(budgets, PAGINATION_SIZE)
-        page_obj = paginator.get_page(1)
-        context.update({
-            "page_obj": page_obj,
-            "paginator": paginator,
-            "budgets": page_obj.object_list,
-            "is_paginated": paginator.num_pages > 1,
-        })
-        # Add month_name to each budget
-        for budget in context['budgets']:
-            budget.month_name = calendar.month_name[budget.month]
-        return context
+        try:
+            context = super().get_context_data(**kwargs)
+            budgets = Budget.objects.filter(user=self.request.user)
+            paginator = Paginator(budgets, PAGINATION_SIZE)
+            page_obj = paginator.get_page(1)
+            context.update({
+                "page_obj": page_obj,
+                "paginator": paginator,
+                "budgets": page_obj.object_list,
+                "is_paginated": paginator.num_pages > 1,
+            })
+            # Add month_name to each budget
+            for budget in context['budgets']:
+                budget.month_name = calendar.month_name[budget.month]
+            return context
+        except Exception as e:
+            messages.error(self.request, f"Error loading context: {str(e)}")
+            return super().get_context_data(**kwargs)
 
     def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
-        messages.success(self.request, "Budget added successfully")
-        if self.request.htmx:
-            # htmx-oob is used to update multiple elements (table and messages) which are not in the same container  
-            context['is_oob'] = True
-            table_html = render_to_string("budgets/partials/budgets_table.html", context, request=self.request)
-            message_html = render_to_string("budgets/components/messages.html", context, request=self.request)
-            return HttpResponse(f"{table_html}{message_html}")
+        try:
+            if self.request.htmx:
+                # htmx-oob is used to update multiple elements (table and messages) which are not in the same container  
+                context['is_oob'] = True
+                table_html = render_to_string("budgets/partials/budgets_table.html", context, request=self.request)
+                message_html = render_to_string("budgets/components/messages.html", context, request=self.request)
+                return HttpResponse(f"{table_html}{message_html}")
 
-        return super().render_to_response(context)
+            return super().render_to_response(context)
+        except Exception as e:
+            messages.error(self.request, f"Error rendering response: {str(e)}")
+            return super().render_to_response(context)
 
 
 def open_budget_create_modal(request):
