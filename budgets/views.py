@@ -135,6 +135,12 @@ class BudgetCreateView(CreateView):
             for budget in context['budgets']:
                 budget.month_name = calendar.month_name[budget.month]
                 budget.expense = get_expense_for_budget(budget.user, budget.category, budget.month, budget.year)
+                if budget.expense > budget.amount:
+                    print("DEBUG: Adding warning for", budget.category.name)
+                    messages.warning(
+                    self.request,
+                    f"Warning: Your expenses for '{budget.category.name}' in {budget.month_name} {budget.year} (${budget.expense:.2f}) have exceeded your budget (${budget.amount:.2f})."
+                )
             return context
         except Exception as e:
             messages.error(self.request, "An error occurred while loading the page. Please refresh and try again.")
@@ -212,7 +218,7 @@ class BudgetUpdateView(LoginRequiredMixin, UpdateView):
             # htmx-oob is used to update multiple elements (table and messages) which are not in the same container  
             context['is_oob'] = True
             budget_html = render_to_string("budgets/partials/budget_row.html", context, request=self.request)
-            message_html = render_to_string("budgets/components/messages.html", context, request=self.request)
+            message_html = render_to_string("components/messages.html", context, request=self.request)
             return HttpResponse(f"{budget_html}{message_html}")
         return super().render_to_response(context, **response_kwargs)
 
@@ -257,7 +263,7 @@ class BudgetDeleteView(LoginRequiredMixin, DeleteView):
             # htmx-oob is used to update multiple elements (table and messages) which are not in the same container  
             context['is_oob'] = True
             table_html = render_to_string("budgets/partials/budgets_table.html", context, request=self.request)
-            message_html = render_to_string("budgets/components/messages.html", context, request=self.request)
+            message_html = render_to_string("components/messages.html", context, request=self.request)
             return HttpResponse(f"{table_html}{message_html}")
 
         return super().render_to_response(context)
