@@ -135,9 +135,21 @@ class BudgetCreateView(CreateView):
                 "budgets": page_obj.object_list,
                 "is_paginated": paginator.num_pages > 1,
             })
-            # Add month_name to each budget
+            # Add month_name and expense to each budget
             for budget in context['budgets']:
                 budget.month_name = calendar.month_name[budget.month]
+                expense = Transaction.objects.filter(
+                    user=budget.user,
+                    category=budget.category,
+                    type='expense'
+                ).annotate(
+                    txn_month=ExtractMonth('created_at'),
+                    txn_year=ExtractYear('created_at')
+                ).filter(
+                    txn_month=budget.month,
+                    txn_year=budget.year
+                ).aggregate(total=Sum('amount'))['total'] or 0
+                budget.expense = expense
             return context
         except Exception as e:
             messages.error(self.request, "An error occurred while loading the page. Please refresh and try again.")
