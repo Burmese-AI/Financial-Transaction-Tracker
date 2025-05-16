@@ -36,6 +36,9 @@ class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    def __str__(self):
+        return f"${self.amount:.2f} {self.get_type_display()} - {self.created_at.date()}"
+    
     class Meta:
         indexes = [
                 models.Index(fields=['user', 'name', 'type', 'category', 'created_at']),
@@ -60,6 +63,9 @@ class Budget(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.category.name} ${self.amount:.2f} ({self.start_date:%b %Y})"
     
     class Meta:
         unique_together = ('user', 'category', 'month', 'year')
