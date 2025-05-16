@@ -15,4 +15,6 @@ urlpatterns = [
     path("transactions/modal/", open_transaction_create_modal, name="transaction_create_modal"),
     path("transactions/<uuid:pk>/modal/", open_transaction_update_modal, name="transaction_update_modal"),
     path("close-modal/", close_modal, name="close_modal"),
+    path('reports/', reports_view, name='reports'),
 ]
+
