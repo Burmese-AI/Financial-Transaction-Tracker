@@ -6,7 +6,7 @@
       <td class="px-6 py-4 whitespace-nowrap text-sm overflow-hidden overflow-ellipsis">
         <div class="flex space-x-2">
           <button
-            hx-get="#"
+            hx-get="{% url 'open_budget_update_modal' budget.pk %}"
             hx-target="#modal-placeholder"
             hx-swap="outerHTML"
             class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-md hover:bg-green-300 focus:outline-none focus:ring-2 focus:ring-green-400"
