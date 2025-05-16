@@ -39,7 +39,7 @@ class BudgetsDashboardView(ListView):
             queryset = queryset.filter(month=month)
         if year:
             queryset = queryset.filter(year=year)
-
+        print("The queryset is: ", queryset)
         return queryset
     
     def get_context_data(self, **kwargs):
@@ -62,7 +62,7 @@ class BudgetsDashboardView(ListView):
     
     def render_to_response(self, context, **response_kwargs):
         if self.request.htmx or self.request.headers.get('Hx-Request') == 'true':
-            context['is_oob'] = True
+            # context['is_oob'] =  True
             table_html = render_to_string('budgets/partials/budgets_table.html', context, request=self.request)
             message_html = render_to_string('budgets/components/budgets_message.html', context, request=self.request)
             
