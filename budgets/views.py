@@ -39,7 +39,6 @@ class BudgetsDashboardView(ListView):
             queryset = queryset.filter(month=month)
         if year:
             queryset = queryset.filter(year=year)
-        print("The queryset is: ", queryset)
         return queryset
     
     def get_context_data(self, **kwargs):
@@ -57,12 +56,10 @@ class BudgetsDashboardView(ListView):
         context['categories'] = Category.objects.all()
         context['months'] = [(i, calendar.month_name[i]) for i in range(1, 13)]
         context['years'] = Budget.objects.filter(user=self.request.user).values_list('year', flat=True).distinct().order_by('-year')
-        # Add current filter values
         return context
     
     def render_to_response(self, context, **response_kwargs):
-        if self.request.htmx or self.request.headers.get('Hx-Request') == 'true':
-            # context['is_oob'] =  True
+        if self.request.htmx:
             table_html = render_to_string('budgets/partials/budgets_table.html', context, request=self.request)
             message_html = render_to_string('budgets/components/budgets_message.html', context, request=self.request)
             
@@ -136,12 +133,6 @@ class BudgetCreateView(CreateView):
             for budget in context['budgets']:
                 budget.month_name = calendar.month_name[budget.month]
                 budget.expense = get_expense_for_budget(budget.user, budget.category, budget.month, budget.year)
-                if budget.expense > budget.amount:
-                    print("DEBUG: Adding warning for", budget.category.name)
-                    messages.error(
-                    self.request,
-                    f"Warning: Your expenses for '{budget.category.name}' in {budget.month_name} {budget.year} (${budget.expense:.2f}) have exceeded your budget (${budget.amount:.2f})."
-                )
             return context
         except Exception as e:
             messages.error(self.request, "An error occurred while loading the page. Please refresh and try again.")
@@ -190,7 +181,6 @@ class BudgetUpdateView(LoginRequiredMixin, UpdateView):
                 original_object = Budget.objects.get(pk=temp_object.pk)
                 context = self.get_context_data(form=form)
                 context['budget'] = original_object
-                context['budget'].month_name = calendar.month_name[original_object.month]
                 return self.render_to_response(context)
             
             # Only now update self.object and save

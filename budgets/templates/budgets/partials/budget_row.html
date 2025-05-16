@@ -1,9 +1,9 @@
-<tr {% if is_oob %}hx-swap-oob="true"{% endif %} id="budget-{{ budget.id}}">
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 overflow-hidden overflow-ellipsis">{{ budget.category.name }}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 overflow-hidden overflow-ellipsis">{{ budget.amount }}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 overflow-hidden overflow-ellipsis">{{ budget.expense|floatformat:2 }}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 overflow-hidden overflow-ellipsis">{{ budget.month_name }}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 overflow-hidden overflow-ellipsis">{{ budget.year }}</td>
+<tr {% if is_oob %}hx-swap-oob="true"{% endif %} id="budget-{{ budget.id}}" class="{% if budget.expense > budget.amount %}bg-red-50 hover:bg-red-100{% endif %}">
+      <td class="px-6 py-4 whitespace-nowrap text-sm {% if budget.expense > budget.amount %}text-red-700 font-medium{% else %}text-gray-500{% endif %} overflow-hidden overflow-ellipsis">{{ budget.category.name }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm {% if budget.expense > budget.amount %}text-red-700 font-medium{% else %}text-gray-900{% endif %} overflow-hidden overflow-ellipsis">{{ budget.amount }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm {% if budget.expense > budget.amount %}text-red-700 font-medium{% else %}text-gray-900{% endif %} overflow-hidden overflow-ellipsis">{{ budget.expense|floatformat:2 }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm {% if budget.expense > budget.amount %}text-red-700 font-medium{% else %}text-gray-500{% endif %} overflow-hidden overflow-ellipsis">{{ budget.month_name }}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm {% if budget.expense > budget.amount %}text-red-700 font-medium{% else %}text-gray-500{% endif %} overflow-hidden overflow-ellipsis">{{ budget.year }}</td>
       <td class="px-6 py-4 whitespace-nowrap text-sm overflow-hidden overflow-ellipsis">
         <div class="flex space-x-2">
           <button
