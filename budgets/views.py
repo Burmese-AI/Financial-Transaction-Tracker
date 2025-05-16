@@ -202,6 +202,19 @@ class BudgetUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['budget'] = self.object
         context['budget'].month_name = calendar.month_name[context['budget'].month]
+        # Add expense calculation for the updated budget
+        expense = Transaction.objects.filter(
+            user=self.object.user,
+            category=self.object.category,
+            type='expense'
+        ).annotate(
+            txn_month=ExtractMonth('created_at'),
+            txn_year=ExtractYear('created_at')
+        ).filter(
+            txn_month=self.object.month,
+            txn_year=self.object.year
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        context['budget'].expense = expense
         return context
     
     def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
