@@ -1,6 +1,6 @@
 <table
   {% if is_oob %}hx-swap-oob="true"{% endif %}
-  class="min-w-full divide-y divide-stone-300 rounded-lg shadow-md"
+  class="w-full mx-auto divide-y divide-stone-300 rounded-lg shadow-md"
   id="transaction-table"
 >
   <thead class="bg-stone-100">
@@ -23,6 +23,9 @@
       >
         <div class="flex items-center cursor-pointer">
           <a
+            hx-get="{% url 'dashboard' %}?sort_direction={{ sort_direction }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if filtered_category != 'all' %}&category={{ filtered_category }}{% endif %}{% if filtered_type != 'all' %}&type={{ filtered_type }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}"
+            hx-target="#transaction-table-container"
+            hx-swap="innerHTML"
             class="hover:text-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
           >
             Amount
@@ -61,11 +64,22 @@
             id="categoryDropdownMenu"
             class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50"
           >
+            <a
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 {% if filtered_category == 'all' %}bg-amber-100 text-amber-800{% endif %}"
+              hx-get="{% url 'dashboard' %}?{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if sort_direction %}&sort_direction={{ sort_direction }}{% endif %}{% if filtered_type != 'all' %}&type={{ filtered_type }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}"
+              hx-target="#transaction-table-container"
+              hx-swap="innerHTML"
+            >
+              All
+            </a>
             {% for category in categories %}
             <a
-              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 {% if filtered_category == category.name %}bg-amber-100 text-amber-800{% endif %}"
+              hx-get="{% url 'dashboard' %}?category={{ category.name }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if sort_direction %}&sort_direction={{ sort_direction }}{% endif %}{% if filtered_type != 'all' %}&type={{ filtered_type }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}"
+              hx-target="#transaction-table-container"
+              hx-swap="innerHTML"
             >
-              {{ category }}
+              {{ category.name }}
             </a>
             {% endfor %}
           </div>
@@ -100,9 +114,20 @@
             id="typeDropdownMenu"
             class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50"
           >
+            <a
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 {% if filtered_type == 'all' %}bg-amber-100 text-amber-800{% endif %}"
+              hx-get="{% url 'dashboard' %}?{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if sort_direction %}&sort_direction={{ sort_direction }}{% endif %}{% if filtered_category != 'all' %}&category={{ filtered_category }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}"
+              hx-target="#transaction-table-container"
+              hx-swap="innerHTML"
+            >
+              All
+            </a>
             {% for type in types %}
             <a
-              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 {% if filtered_type == type %}bg-amber-100 text-amber-800{% endif %}"
+              hx-get="{% url 'dashboard' %}?type={{ type }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if sort_direction %}&sort_direction={{ sort_direction }}{% endif %}{% if filtered_category != 'all' %}&category={{ filtered_category }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}"
+              hx-target="#transaction-table-container"
+              hx-swap="innerHTML"
             >
               {{ type }}
             </a>
@@ -114,7 +139,61 @@
         scope="col"
         class="px-6 py-3 text-left text-xs font-medium text-stone-600 uppercase tracking-wider"
       >
-        Created At
+        <div class="relative inline-block text-left">
+          <button
+            id="dateRangeToggle"
+            type="button"
+            class="inline-flex items-center px-4 py-2 bg-stone-100 rounded-md shadow-sm text-stone-600 hover:bg-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+            aria-expanded="false"
+            aria-controls="dateRangeMenu"
+          >
+            Created At
+            <svg
+              class="w-4 h-4 ml-2"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.72-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+          <div
+            id="dateRangeMenu"
+            class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 p-2"
+          >
+            <div class="flex flex-col gap-2">
+              <label for="startDate" class="text-sm text-gray-700">Start Date</label>
+              <input
+                type="date"
+                id="startDate"
+                name="start_date"
+                value="{{ request.GET.start_date|default_if_none:'' }}"
+                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+              <label for="endDate" class="text-sm text-gray-700">End Date</label>
+              <input
+                type="date"
+                id="endDate"
+                name="end_date"
+                value="{{ request.GET.end_date|default_if_none:'' }}"
+                class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+              <button
+                type="button"
+                hx-get="{% url 'dashboard' %}?{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if sort_direction %}&sort_direction={{ sort_direction }}{% endif %}{% if filtered_category != 'all' %}&category={{ filtered_category }}{% endif %}{% if filtered_type != 'all' %}&type={{ filtered_type }}{% endif %}"
+                hx-vals='js:{"start_date": document.getElementById("startDate").value, "end_date": document.getElementById("endDate").value}'
+                hx-target="#transaction-table-container"
+                hx-swap="innerHTML"
+                class="mt-2 px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+        </div>
       </th>
       <th
         scope="col"
@@ -140,55 +219,103 @@
 </table>
 <div id="pagination" class="mt-4">{% include "partials/pagination.html" %}</div>
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
+  (function () {
+    // Function to remove existing event listeners to prevent duplicates
+    function removeEventListeners(element, event, handler) {
+      const newElement = element.cloneNode(true);
+      element.parentNode.replaceChild(newElement, element);
+      return newElement;
+    }
+
+    // Define dropdown toggle configuration
     const dropdownToggles = [
       {
-        toggle: document.getElementById("categoryDropdownToggle"),
-        menu: document.getElementById("categoryDropdownMenu"),
+        toggleId: "categoryDropdownToggle",
+        menuId: "categoryDropdownMenu",
       },
       {
-        toggle: document.getElementById("typeDropdownToggle"),
-        menu: document.getElementById("typeDropdownMenu"),
+        toggleId: "typeDropdownToggle",
+        menuId: "typeDropdownMenu",
+      },
+      {
+        toggleId: "dateRangeToggle",
+        menuId: "dateRangeMenu",
       },
     ];
 
     // Function to close all dropdowns
     function closeAllDropdowns() {
-      dropdownToggles.forEach(({ toggle, menu }) => {
-        menu.classList.add("hidden");
-        toggle.setAttribute("aria-expanded", "false");
+      dropdownToggles.forEach(({ toggleId, menuId }) => {
+        const menu = document.getElementById(menuId);
+        const toggle = document.getElementById(toggleId);
+        if (menu && toggle) {
+          menu.classList.add("hidden");
+          toggle.setAttribute("aria-expanded", "false");
+        }
       });
     }
 
-    // Toggle dropdown and close others
-    dropdownToggles.forEach(({ toggle, menu }) => {
-      toggle.addEventListener("click", function (e) {
-        e.stopPropagation();
-        const isExpanded = toggle.getAttribute("aria-expanded") === "true";
-        closeAllDropdowns();
-        if (!isExpanded) {
-          menu.classList.remove("hidden");
-          toggle.setAttribute("aria-expanded", "true");
+    // Initialize dropdown functionality
+    function initializeDropdowns() {
+      dropdownToggles.forEach(({ toggleId, menuId }) => {
+        let toggle = document.getElementById(toggleId);
+        const menu = document.getElementById(menuId);
+
+        if (!toggle || !menu) {
+          console.warn(`Dropdown elements not found: ${toggleId} or ${menuId}`);
+          return;
         }
+
+        // Remove existing event listeners to prevent duplicates
+        toggle = removeEventListeners(toggle, "click", null);
+        toggle = removeEventListeners(toggle, "keydown", null);
+
+        // Add click event listener for toggling
+        toggle.addEventListener("click", function (e) {
+          console.log(`Dropdown toggle clicked: ${toggleId}`);
+          e.stopPropagation();
+          const isExpanded = toggle.getAttribute("aria-expanded") === "true";
+          closeAllDropdowns();
+          if (!isExpanded) {
+            menu.classList.remove("hidden");
+            toggle.setAttribute("aria-expanded", "true");
+          }
+        });
+
+        // Add keyboard accessibility
+        toggle.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === "Space") {
+            e.preventDefault();
+            toggle.click();
+          }
+        });
       });
 
-      // Handle keyboard accessibility
-      toggle.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          toggle.click();
-        }
-      });
-    });
+      // Remove existing document click listener to prevent duplicates
+      document.removeEventListener("click", handleOutsideClick);
+      document.addEventListener("click", handleOutsideClick);
 
-    // Close dropdowns when clicking outside
-    document.addEventListener("click", function (e) {
-      const isClickInsideDropdown = dropdownToggles.some(({ toggle, menu }) =>
-        toggle.contains(e.target) || menu.contains(e.target)
-      );
-      if (!isClickInsideDropdown) {
-        closeAllDropdowns();
+      function handleOutsideClick(e) {
+        const isClickInsideDropdown = dropdownToggles.some(({ toggleId, menuId }) => {
+          const toggle = document.getElementById(toggleId);
+          const menu = document.getElementById(menuId);
+          return toggle && menu && (toggle.contains(e.target) || menu.contains(e.target));
+        });
+        if (!isClickInsideDropdown) {
+          closeAllDropdowns();
+        }
+      }
+    }
+
+    // Initialize dropdowns immediately
+    initializeDropdowns();
+
+    // Re-initialize dropdowns after HTMX swap
+    document.addEventListener("htmx:afterSwap", function (event) {
+      // Check if the swap involves the transaction table
+      if (event.target.id === "transaction-table" || event.target.id === "transaction-table-container") {
+        initializeDropdowns();
       }
     });
-  });
+  })();
 </script>

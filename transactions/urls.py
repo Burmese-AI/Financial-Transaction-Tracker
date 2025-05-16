@@ -7,10 +7,6 @@ urlpatterns = [
     path("transactions/", TransactionCreateView.as_view(), name="transaction_create"),
     path("transactions/<uuid:pk>/update", TransactionUpdateView.as_view(), name="transaction_update"),
     path("transactions/<uuid:pk>/delete", TransactionDeleteView.as_view(), name="transaction_delete"),
-    path("transactions/search", TransactionSearchView.as_view(), name="transaction_search"),
-    path("transactions/sort", TransactionSortView.as_view(), name="transaction_sort"), 
-    path("transactions/Filter", TransactionFilterView.as_view(), name="transaction_filter"),
-
     ### Function Views
     path("transactions/exportcsv", exportcsv, name="exportcsv"),
     path("transactions/importcsv", importcsv, name="importcsv"),

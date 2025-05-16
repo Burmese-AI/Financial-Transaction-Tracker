@@ -29,12 +29,60 @@ class TransactionListView(LoginRequiredMixin, ListView):
     paginate_by = PAGINATION_SIZE
     
     def get_queryset(self):
-        return Transaction.objects.filter(user=self.request.user)
+        query = Transaction.objects.filter(user=self.request.user)
+        
+        # Searching by name or description
+        search_query_param = self.request.GET.get('search')
+        if search_query_param: 
+            query = query.filter(Q(name__contains=search_query_param) | Q(description__contains=search_query_param))
+        
+        #Sorting by amount based on direction (asc or desc)
+        # Store current sorting direction to pass in the context
+        self.sort_direction_query_param = self.request.GET.get('sort_direction', 'asc')
+        query = query.order_by('amount') if self.sort_direction_query_param == 'asc' else query.order_by('-amount')
+        
+        # Filtering by category
+        # Store current category to pass in the context
+        self.category_query_param = self.request.GET.get('category', 'all')
+        if self.category_query_param and self.category_query_param is not 'all':
+            query = query.filter(category__name=self.category_query_param)
+        
+        # Filtering by transaction type
+        # Store current type to pass in the context
+        self.type_query_param = self.request.GET.get('type', 'all')
+        if self.type_query_param and self.type_query_param is not 'all':
+            query = query.filter(type=self.type_query_param)
+            
+        # Filtering by date range
+        # Store start and end dates to pass in the context
+        self.start_date_query_param = self.request.GET.get('start_date')
+        self.end_date_query_param = self.request.GET.get('end_date')
+        print(f">>>> {self.start_date_query_param} - {self.end_date_query_param} <<<<")
+        if self.start_date_query_param and self.end_date_query_param:
+            try:
+                # Ensure dates are in a valid format (YYYY-MM-DD) and apply the range filter
+                # Edge Case:
+                # - If start_date is "2024-01-01", it includes everything from "2024-01-01 00:00:00"
+                # - If end_date is "2024-01-31", it includes everything up to "2024-01-31 00:00:00"
+                # So while the range is technically inclusive, transactions created on the end date after 00:00:00 won't be included
+                query = query.filter(created_at__range=(self.start_date_query_param, self.end_date_query_param))
+            except (ValueError, TypeError):
+                # If dates are invalid, skip the filter to avoid errors
+                pass
+        
+        return query
     
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
         context['types'] = [value for value, label in Transaction.TRANSACTION_TYPES]
+        # Get current sorting direction, return the opposite for the next available sorting
+        context['sort_direction'] = 'desc' if self.sort_direction_query_param == 'asc' else 'asc'
+        context['filtered_category'] = self.category_query_param
+        context['filtered_type'] = self.type_query_param
+        # Pass the current date range to the template
+        context['start_date'] = self.start_date_query_param if self.start_date_query_param else ''
+        context['end_date'] = self.end_date_query_param if self.end_date_query_param else ''
         return context
     
     def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
@@ -65,6 +113,8 @@ class TransactionCreateView(CreateView):
             "paginator": paginator,
             "transactions": page_obj.object_list,
             "is_paginated": paginator.num_pages > 1,
+            'categories': Category.objects.all(),
+            'types': [value for value, label in Transaction.TRANSACTION_TYPES]
         })
 
         return context
@@ -137,6 +187,8 @@ class TransactionDeleteView(LoginRequiredMixin, DeleteView):
             "paginator": paginator,
             "transactions": page_obj.object_list,
             "is_paginated": paginator.num_pages > 1,
+            'categories': Category.objects.all(),
+            'types': [value for value, label in Transaction.TRANSACTION_TYPES]
         })
 
         return context
@@ -151,61 +203,6 @@ class TransactionDeleteView(LoginRequiredMixin, DeleteView):
             return HttpResponse(f"{table_html}{message_html}")
 
         return super().render_to_response(context)
-
-class TransactionSearchView(LoginRequiredMixin, ListView):
-    model = Transaction
-    template_name = "partials/transaction_table.html"
-    success_url = reverse_lazy("dashboard")
-    context_object_name = "transactions"
-    paginate_by = PAGINATION_SIZE
-
-    def get_queryset(self):
-        query = self.request.GET.get('search')
-        if query:
-            return Transaction.objects.filter(Q(name__contains=query) | Q(description__contains=query))
-        return Transaction.objects.all()
-
-class TransactionSortView(LoginRequiredMixin, ListView):
-    model = Transaction
-    template_name = "partials/transaction_table.html"
-    success_url = reverse_lazy("dashboard")
-    context_object_name = "transactions"
-    paginate_by = PAGINATION_SIZE
-
-    def get_queryset(self):
-        sort_direction = self.request.GET.get('sort_direction', 'asc')
-        self.current_sort_direction = sort_direction
-        if sort_direction == 'asc':
-            transactions = Transaction.objects.all().order_by('amount')
-        else:
-            transactions = Transaction.objects.all().order_by('-amount')
-        return transactions
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        next_sort= 'desc' if self.current_sort_direction == 'asc' else 'asc'
-        context['sort_direction'] = next_sort
-        return context
-    
-    def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
-        if self.request.htmx:
-            return render(self.request, "partials/transaction_table.html", context)
-        return super().render_to_response(context, **response_kwargs)
-
-class TransactionFilterView(LoginRequiredMixin, ListView):
-    model = Transaction
-    template_name = "partials/transaction_table.html"
-    success_url = reverse_lazy("dashboard")
-    context_object_name = "transactions"
-    paginate_by = PAGINATION_SIZE
-    
-    def get_queryset(self):
-        category = self.request.GET.get('category', 'all')
-        print(category)
-        if category:
-            return Transaction.objects.filter(category__name=category)
-        return Transaction.objects.all()
 
 def importcsv(request):
     if request.method == 'POST' and request.FILES.get("transaction_csv"):
