@@ -1,5 +1,7 @@
 import json
+import csv
 from datetime import timedelta, datetime
+from io import TextIOWrapper
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
@@ -9,7 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.template.loader import render_to_string
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render,redirect
 from django.urls import reverse_lazy
 from django.db.models import Q # For combining queries
 from typing import Any
@@ -201,6 +203,64 @@ class TransactionDeleteView(LoginRequiredMixin, DeleteView):
             return HttpResponse(f"{table_html}{message_html}")
 
         return super().render_to_response(context)
+
+def importcsv(request):
+    if request.method == 'POST' and request.FILES.get("transaction_csv"):
+        file = request.FILES["transaction_csv"]
+        rows = csv.DictReader(TextIOWrapper(file, encoding='utf-8', newline=""))
+
+        ### To make the 'keys' case-insensitive
+        flattened_row = [] 
+        for row in rows:
+            row = {key.lower(): value for key, value in row.items()}
+            flattened_row.append(row)
+        
+        rows = flattened_row
+
+        count = 0 # To count transactions
+        for row in rows:
+            try:
+                category = Category.objects.get(name__iexact=row['category'])
+            except:
+                category = Category.objects.create(name=row['category'])
+            name = row['name']
+            description = row['description']
+            amount = row['amount']
+            type = row['type']
+
+            Transaction.objects.create(
+                name=name,
+                description=description,
+                amount=amount,
+                category=category,
+                type=type,
+                user = request.user,
+            )
+
+            count += 1
+        return redirect('dashboard')
+
+def exportcsv(request):
+    filename = f"{request.user}-transactions-report-{datetime.today().strftime('%Y-%m-%d')}.csv"
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={
+            "Content-Disposition":  f"attachment; filename={filename}"
+            },
+        )
+
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'Name', 'Description', 'Amount', 'Category', 'Type' ])
+    for transaction in Transaction.objects.all():
+        writer.writerow([
+            transaction.id,
+            transaction.name,
+            transaction.description,
+            transaction.amount,
+            transaction.category,
+            transaction.type,
+        ])
+    return response
 
 def open_transaction_create_modal(request):
     form = TransactionForm()
