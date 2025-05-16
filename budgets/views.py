@@ -46,19 +46,7 @@ class BudgetsDashboardView(ListView):
         context = super().get_context_data(**kwargs)
         for budget in context['budgets']:
             budget.month_name = calendar.month_name[budget.month]
-            # Calculate total expenses for this budget's category, month, year, and user
-            expense = Transaction.objects.filter(
-                user=budget.user,
-                category=budget.category,
-                type='expense'
-            ).annotate(
-                txn_month=ExtractMonth('created_at'),
-                txn_year=ExtractYear('created_at')
-            ).filter(
-                txn_month=budget.month,
-                txn_year=budget.year
-            ).aggregate(total=Sum('amount'))['total'] or 0
-            budget.expense = expense
+            budget.expense = get_expense_for_budget(budget.user, budget.category, budget.month, budget.year)
         # Add filter options
         context['categories'] = Category.objects.all()
         context['months'] = [(i, calendar.month_name[i]) for i in range(1, 13)]
@@ -138,18 +126,7 @@ class BudgetCreateView(CreateView):
             # Add month_name and expense to each budget
             for budget in context['budgets']:
                 budget.month_name = calendar.month_name[budget.month]
-                expense = Transaction.objects.filter(
-                    user=budget.user,
-                    category=budget.category,
-                    type='expense'
-                ).annotate(
-                    txn_month=ExtractMonth('created_at'),
-                    txn_year=ExtractYear('created_at')
-                ).filter(
-                    txn_month=budget.month,
-                    txn_year=budget.year
-                ).aggregate(total=Sum('amount'))['total'] or 0
-                budget.expense = expense
+                budget.expense = get_expense_for_budget(budget.user, budget.category, budget.month, budget.year)
             return context
         except Exception as e:
             messages.error(self.request, "An error occurred while loading the page. Please refresh and try again.")
@@ -214,19 +191,12 @@ class BudgetUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['budget'] = self.object
         context['budget'].month_name = calendar.month_name[context['budget'].month]
-        # Add expense calculation for the updated budget
-        expense = Transaction.objects.filter(
-            user=self.object.user,
-            category=self.object.category,
-            type='expense'
-        ).annotate(
-            txn_month=ExtractMonth('created_at'),
-            txn_year=ExtractYear('created_at')
-        ).filter(
-            txn_month=self.object.month,
-            txn_year=self.object.year
-        ).aggregate(total=Sum('amount'))['total'] or 0
-        context['budget'].expense = expense
+        context['budget'].expense = get_expense_for_budget(
+            context['budget'].user,
+            context['budget'].category,
+            context['budget'].month,
+            context['budget'].year
+        )
         return context
     
     def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
@@ -300,4 +270,17 @@ def open_budget_update_modal(request, pk):
     
 def close_modal(request):
     return render(request, "budgets/components/modal_placeholder.html")
+    
+def get_expense_for_budget(user, category, month, year):
+    return Transaction.objects.filter(
+        user=user,
+        category=category,
+        type='expense'
+    ).annotate(
+        txn_month=ExtractMonth('created_at'),
+        txn_year=ExtractYear('created_at')
+    ).filter(
+        txn_month=month,
+        txn_year=year
+    ).aggregate(total=Sum('amount'))['total'] or 0
     
