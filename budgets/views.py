@@ -83,7 +83,7 @@ class BudgetCreateView(CreateView):
         return context
 
     def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
-        messages.success(self.request, "Budget added successfully!")
+        messages.success(self.request, "Budget added successfully")
         if self.request.htmx:
             # htmx-oob is used to update multiple elements (table and messages) which are not in the same container  
             context['is_oob'] = True
