@@ -47,6 +47,12 @@ class BudgetsDashboardView(ListView):
         for budget in context['budgets']:
             budget.month_name = calendar.month_name[budget.month]
             budget.expense = get_expense_for_budget(budget.user, budget.category, budget.month, budget.year)
+            if budget.expense > budget.amount:
+                print("DEBUG: Adding warning for", budget.category.name)
+                messages.warning(
+                    self.request,
+                    f"Warning: Your expenses for '{budget.category.name}' in {budget.month_name} {budget.year} (${budget.expense:.2f}) have exceeded your budget (${budget.amount:.2f})."
+                )
         # Add filter options
         context['categories'] = Category.objects.all()
         context['months'] = [(i, calendar.month_name[i]) for i in range(1, 13)]
@@ -55,9 +61,11 @@ class BudgetsDashboardView(ListView):
         return context
     
     def render_to_response(self, context, **response_kwargs):
-        if self.request.headers.get('Hx-Request') == 'true':
-            html = render_to_string('budgets/partials/budgets_table.html', context, request=self.request)
-            return HttpResponse(html)
+        if self.request.htmx or self.request.headers.get('Hx-Request') == 'true':
+            context['is_oob'] = True
+            table_html = render_to_string('budgets/partials/budgets_table.html', context, request=self.request)
+            message_html = render_to_string('budgets/components/messages.html', context, request=self.request)
+            return HttpResponse(f"{table_html}{message_html}")
         return super().render_to_response(context, **response_kwargs)
   
 
@@ -138,7 +146,7 @@ class BudgetCreateView(CreateView):
                 # htmx-oob is used to update multiple elements (table and messages) which are not in the same container  
                 context['is_oob'] = True
                 table_html = render_to_string("budgets/partials/budgets_table.html", context, request=self.request)
-                message_html = render_to_string("budgets/components/messages.html", context, request=self.request)
+                message_html = render_to_string("components/messages.html", context, request=self.request)
                 return HttpResponse(f"{table_html}{message_html}")
 
             return super().render_to_response(context)
@@ -230,6 +238,9 @@ class BudgetDeleteView(LoginRequiredMixin, DeleteView):
         budgets = Budget.objects.filter(user=self.request.user)
         paginator = Paginator(budgets, PAGINATION_SIZE)
         page_obj = paginator.get_page(1)
+        for budget in page_obj.object_list:
+            budget.month_name = calendar.month_name[budget.month]
+            budget.expense = get_expense_for_budget(budget.user, budget.category, budget.month, budget.year)
         # Merge the existing context dict with the new one
         context.update({
             "page_obj": page_obj,
