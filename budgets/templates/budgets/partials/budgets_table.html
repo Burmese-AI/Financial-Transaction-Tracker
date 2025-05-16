@@ -24,10 +24,6 @@ id="budget-table"
   {% endfor %}
 </tbody>
 </table>
-<div class="flex justify-between items-center mb-6">
-  <p class="text-sm text-gray-500 mt-1">Total Budget: ${{ total_budget_limit|floatformat:2 }}
-  </p>
-</div>
 <div id="pagination" class="mt-4">
   {% include "budgets/partials/pagination.html" %}
 </div>
