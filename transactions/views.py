@@ -14,6 +14,7 @@ from django.urls import reverse_lazy
 from django.db.models import Q # For combining queries
 from typing import Any
 from .models import Transaction, Category
+from budgets.models import Budget
 from .forms import TransactionForm
 from django.utils import timezone
 
