@@ -4,9 +4,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from uuid import uuid4
 from datetime import datetime
 
-
-
-
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     name = models.CharField(max_length=255)
@@ -39,9 +36,11 @@ class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    def __str__(self):
+        return f"${self.amount:.2f} {self.get_type_display()} - {self.created_at.date()}"
+    
     class Meta:
         indexes = [
                 models.Index(fields=['user', 'name', 'type', 'category', 'created_at']),
         ]
         ordering = ['-created_at']
-    

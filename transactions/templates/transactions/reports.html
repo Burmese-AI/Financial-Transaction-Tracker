@@ -1,0 +1,296 @@
+{% extends 'main.html' %} {% block content %}
+
+<div class="bg-gray-50 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <header class="mb-8 lg:mb-10">
+      <h1 class="text-3xl font-bold text-gray-800">Financial Reporting</h1>
+      <p class="text-gray-600 mt-2">Your financial overview and analysis</p>
+    </header>
+
+    <!-- Summary Metrics -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8 lg:mb-10">
+      <!-- Total Income -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wider">
+          Total Income
+        </h2>
+        <p class="mt-2 text-3xl font-bold text-green-600">{{ total_income }}</p>
+      </div>
+
+      <!-- Total Expenses -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wider">
+          Total Expenses
+        </h2>
+        <p class="mt-2 text-3xl font-bold text-red-600">{{ total_expenses }}</p>
+      </div>
+
+      <!-- Net Balance -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wider">
+          Net Balance
+        </h2>
+        <p class="mt-2 text-3xl font-bold text-blue-600">{{ net_balance }}</p>
+      </div>
+
+      <!-- Average Monthly Expense -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wider">
+          Avg. Monthly Expense
+        </h2>
+        <p class="mt-2 text-3xl font-bold text-purple-600">{{ avg_monthly_expense }}</p>
+      </div>
+    </section>
+
+    <!-- Chart Visualizations -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-8 lg:mb-10">
+      <!-- Expenses by Category -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-medium text-gray-800 mb-4">
+          Expenses by Category
+        </h2>
+        <div class="h-72">
+          <canvas id="expensesByCategoryChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Income vs Expense Trend -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-medium text-gray-800 mb-4">
+          Income vs Expense Trend
+        </h2>
+        <div class="h-72">
+          <canvas id="incomeVsExpenseChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Monthly Breakdown -->
+      <div class="bg-white rounded-lg shadow p-6 col-span-1 lg:col-span-2">
+        <h2 class="text-lg font-medium text-gray-800 mb-4">
+          Monthly Breakdown of Spending
+        </h2>
+        <div class="h-96">
+          <canvas id="monthlyBreakdownChart"></canvas>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  // Get data from Django context
+  const categoryLabels = JSON.parse('{{ category_labels|safe }}');
+  const categoryData = JSON.parse('{{ category_data|safe }}');
+  const categoryColors = JSON.parse('{{ category_colors|safe }}');
+  const categoryBorders = JSON.parse('{{ category_borders|safe }}');
+  const months = JSON.parse('{{ months|safe }}');
+  const incomeByMonth = JSON.parse('{{ income_by_month|safe }}');
+  const expenseByMonth = JSON.parse('{{ expense_by_month|safe }}');
+  const monthlyBreakdown = JSON.parse('{{ monthly_breakdown|safe }}');
+
+  // Expenses by Category Chart
+  const expensesCategoryCtx = document
+    .getElementById("expensesByCategoryChart")
+    .getContext("2d");
+  new Chart(expensesCategoryCtx, {
+    type: "bar",
+    data: {
+      labels: categoryLabels,
+      datasets: [
+        {
+          label: "Expenses ($)",
+          data: categoryData,
+          backgroundColor: categoryColors,
+          borderColor: categoryBorders,
+          borderWidth: 1,
+          barPercentage: 0.8,
+          categoryPercentage: 0.9,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'end',
+          labels: {
+            boxWidth: 10,
+            usePointStyle: true,
+            pointStyle: 'rect',
+            padding: 15
+          }
+        },
+        tooltip: {
+          padding: 10,
+          titleFont: {
+            size: 14
+          },
+          bodyFont: {
+            size: 13
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
+        }
+      },
+    },
+  });
+
+  // Income vs Expense Trend Chart
+  const incomeVsExpenseCtx = document
+    .getElementById("incomeVsExpenseChart")
+    .getContext("2d");
+  new Chart(incomeVsExpenseCtx, {
+    type: "line",
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: "Income",
+          data: incomeByMonth,
+          borderColor: "rgba(75, 192, 192, 1)",
+          backgroundColor: "rgba(75, 192, 192, 0.3)",
+          tension: 0.2,
+          fill: true,
+          borderWidth: 2,
+        },
+        {
+          label: "Expenses",
+          data: expenseByMonth,
+          borderColor: "rgba(255, 99, 132, 1)",
+          backgroundColor: "rgba(255, 99, 132, 0.3)",
+          tension: 0.2,
+          fill: true,
+          borderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'end',
+          labels: {
+            boxWidth: 10,
+            usePointStyle: true,
+            pointStyle: 'rect',
+            padding: 15
+          }
+        },
+        tooltip: {
+          padding: 10,
+          titleFont: {
+            size: 14
+          },
+          bodyFont: {
+            size: 13
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        }
+      },
+    },
+  });
+
+  // Monthly Breakdown Chart
+  const monthlyBreakdownCtx = document
+    .getElementById("monthlyBreakdownChart")
+    .getContext("2d");
+  
+  // Prepare datasets from monthly breakdown data
+  const monthlyBreakdownDatasets = monthlyBreakdown.map((category, index) => {
+    return {
+      label: category.category,
+      data: category.data,
+      backgroundColor: categoryColors[index % categoryColors.length],
+      borderColor: categoryBorders[index % categoryBorders.length],
+      borderWidth: 1,
+      barPercentage: 0.8,
+      categoryPercentage: 0.9,
+    };
+  });
+  
+  new Chart(monthlyBreakdownCtx, {
+    type: "bar",
+    data: {
+      labels: months,
+      datasets: monthlyBreakdownDatasets,
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'start',
+          labels: {
+            boxWidth: 10,
+            usePointStyle: true,
+            pointStyle: 'rect',
+            padding: 15,
+            font: {
+              size: 11
+            }
+          }
+        },
+        tooltip: {
+          padding: 10,
+          titleFont: {
+            size: 14
+          },
+          bodyFont: {
+            size: 13
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          grid: {
+            display: false
+          }
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+      },
+      barPercentage: 0.8,
+      categoryPercentage: 0.9,
+    },
+  });
+</script>
+
+{% endblock %}
