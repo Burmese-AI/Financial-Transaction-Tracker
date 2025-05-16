@@ -1,5 +1,5 @@
 {% extends "main.html" %} {% block content %}
-<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+<div class="w-full px-4 sm:px-6 lg:px-8 py-6">
   <!-- Title and Add Button -->
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-semibold text-gray-900">Transactions</h1>
@@ -16,7 +16,7 @@
   <!-- Search Bar, Search Button, and Clear Button -->
   <div class="mb-4 w-full">
     <form
-      hx-get="{% url 'transaction_search' %}"
+      hx-get="{% url 'dashboard' %}"
       hx-target="#transaction-table-container"
       hx-swap="innerHTML"
       class="flex items-center gap-2"
@@ -25,6 +25,7 @@
       <input
         type="text"
         name="search"
+        value="{{ request.GET.search|default_if_none:'' }}"
         class="outline-none w-full p-2 text-sm font-medium text-stone-800 placeholder-stone-500 bg-transparent border-b-2 border-stone-300 focus:border-amber-700 hover:border-amber-700 active:border-amber-700 focus:ring-0 transition-colors duration-200"
         placeholder="Search by name"
         id="search-input"
@@ -49,14 +50,14 @@
         Search
       </button>
       <button
-        type="button"
-        hx-get="{% url 'transaction_search' %}"
+        type="submit"
+        hx-get="{% url 'dashboard' %}"
         hx-target="#transaction-table-container"
         hx-swap="innerHTML"
-        hx-vals='{"search": ""}'
+        hx-vals='{"page": "1"}'
+        hx-on:click="document.getElementById('search-input').value = ''"
         class="px-5 py-2 text-sm font-medium text-stone-800 bg-stone-200 rounded-md shadow-sm transition-colors duration-200 transform hover:scale-105 hover:bg-stone-400 active:scale-95 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2"
-        aria-label="Clear search"
-        onclick="document.getElementById('search-input').value = ''"
+        aria-label="Clear all filters"
       >
         Clear
       </button>
