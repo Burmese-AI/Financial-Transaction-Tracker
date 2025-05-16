@@ -6,7 +6,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .forms import BudgetForm
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -142,7 +142,61 @@ class BudgetCreateView(CreateView):
             messages.error(self.request, "An error occurred while updating the page. Please refresh and try again.")
             return super().render_to_response(context)
 
-
+class BudgetUpdateView(LoginRequiredMixin, UpdateView):
+    model = Budget
+    form_class = BudgetForm
+    template_name = "budgets/partials/budgets_table.html"
+    
+    def get_queryset(self):
+        # Ensuring User can only update their own budgets
+        return Budget.objects.filter(user=self.request.user)
+    
+    def form_valid(self, form):
+        try:
+            # Do NOT update self.object yet
+            temp_object = form.save(commit=False)
+            existing_budget = Budget.objects.filter(
+                user=self.request.user,
+                category=form.cleaned_data['category'],
+                month=form.cleaned_data['month'],
+                year=form.cleaned_data['year']
+            ).exclude(pk=temp_object.pk).first()
+            
+            if existing_budget:
+                messages.error(
+                    self.request, 
+                    f"A budget for {form.cleaned_data['category']} in {calendar.month_name[form.cleaned_data['month']]} {form.cleaned_data['year']} already exists."
+                )
+                # Re-fetch the original object from the database to avoid showing unsaved changes
+                original_object = Budget.objects.get(pk=temp_object.pk)
+                context = self.get_context_data(form=form)
+                context['budget'] = original_object
+                context['budget'].month_name = calendar.month_name[original_object.month]
+                return self.render_to_response(context)
+            
+            # Only now update self.object and save
+            self.object = temp_object
+            self.object.save()
+            messages.success(self.request, "Budget updated successfully!")
+            return self.render_to_response(self.get_context_data())
+        except Exception as e:
+            messages.error(self.request, "An error occurred while updating the budget. Please try again.")
+            return self.render_to_response(self.get_context_data(form=form))
+    
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['budget'] = self.object
+        context['budget'].month_name = calendar.month_name[context['budget'].month]
+        return context
+    
+    def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
+        if self.request.htmx:
+            # htmx-oob is used to update multiple elements (table and messages) which are not in the same container  
+            context['is_oob'] = True
+            budget_html = render_to_string("budgets/partials/budget_row.html", context, request=self.request)
+            message_html = render_to_string("budgets/components/messages.html", context, request=self.request)
+            return HttpResponse(f"{budget_html}{message_html}")
+        return super().render_to_response(context, **response_kwargs)
 
 class BudgetDeleteView(LoginRequiredMixin, DeleteView):
     model = Budget
