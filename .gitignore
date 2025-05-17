@@ -70,7 +70,10 @@ locale/
 
 # Node.js dependencies
 node_modules/
-package-lock.json
+# package-lock.json
 
 # Build output - only ignore the generated CSS
 static/styles/output.css
+
+#uv-specific
+.uv/
