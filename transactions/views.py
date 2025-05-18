@@ -31,6 +31,12 @@ class TransactionListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         query = Transaction.objects.filter(user=self.request.user)
         
+        if self.request.GET.get('category'):
+            query = query.filter(category__name__iexact=self.request.GET.get('category'))
+        
+        if self.request.GET.get('type'):
+            query = query.filter(type=self.request.GET.get('type'))
+        
         # Sorting by amount
         sort_direction = self.request.GET.get('sort_direction', 'desc')
         self.sort_direction_query_param = sort_direction
@@ -40,8 +46,11 @@ class TransactionListView(LoginRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        # Get current sorting direction, return the opposite for the next available sorting
         context['sort_direction'] = 'desc' if self.sort_direction_query_param == 'asc' else 'asc'
+        context['categories'] = Category.objects.all()
+        context['types'] = [value for value, label in Transaction.TRANSACTION_TYPES]
+        context['selected_category'] = self.request.GET.get('category', '')
+        context['selected_type'] = self.request.GET.get('type', '')
         return context
     
     def render_to_response(self, context: dict[str, Any], **response_kwargs: Any) -> HttpResponse:
