@@ -14,9 +14,47 @@
     </button>
   </div>
 
-  <div class="flex flex-col lg:flex-row justify-between items-center">
-    <!-- Import, Export Buttons -->
-    <div class="w-fit flex items-center space-x-3">
+  <!-- Filter Form (styled like Budgets) -->
+  <div class="mb-6 flex flex-wrap gap-4 items-end bg-stone-50 p-4 rounded-lg shadow-sm">
+    <form
+      id="transaction-filters"
+      hx-get="{% url 'dashboard' %}"
+      hx-trigger="change delay:200ms"
+      hx-target="#transaction-table-container"
+      hx-swap="innerHTML"
+      class="flex flex-wrap gap-4 items-end"
+    >
+      <div>
+        <label for="category" class="block text-xs font-medium text-stone-700 mb-1">Category</label>
+        <select
+          id="category"
+          name="category"
+          class="block w-40 rounded-md border-stone-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm"
+          hx-trigger="change"
+        >
+          <option value="">All</option>
+          {% for category in categories %}
+            <option value="{{ category.name }}" {% if selected_category == category.name %}selected{% endif %}>{{ category.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="type" class="block text-xs font-medium text-stone-700 mb-1">Type</label>
+        <select
+          id="type"
+          name="type"
+          class="block w-40 rounded-md border-stone-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm"
+          hx-trigger="change"
+        >
+          <option value="">All</option>
+          {% for t in types %}
+            <option value="{{ t }}" {% if selected_type == t %}selected{% endif %}>{{ t|capfirst }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </form>
+    <!-- Import/Export (right) -->
+    <div class="flex items-center space-x-3 ml-auto">
       <form
         enctype="multipart/form-data"
         method=post
@@ -52,7 +90,6 @@
           />
         </label>
       </form>
-
       <form method="get" action="{% url 'exportcsv' %}">
         {% csrf_token %}
         <button
@@ -77,45 +114,6 @@
       </form>
     </div>
   </div>
-
-  <!-- Filter Form -->
-  <form
-    id="transaction-filters"
-    hx-get="{% url 'dashboard' %}"
-    hx-trigger="change delay:200ms, keyup delay:400ms from:input"
-    hx-target="#transaction-table-container"
-    hx-swap="innerHTML"
-    class="flex gap-4 items-center mb-4"
-  >
-    <div>
-      <label for="category" class="block font-medium mb-1">Category</label>
-      <select
-        id="category"
-        name="category"
-        class="rounded-md border px-3 py-2"
-        hx-trigger="change"
-      >
-        <option value="">All</option>
-        {% for category in categories %}
-          <option value="{{ category.name }}" {% if selected_category == category.name %}selected{% endif %}>{{ category.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div>
-      <label for="type" class="block font-medium mb-1">Type</label>
-      <select
-        id="type"
-        name="type"
-        class="rounded-md border px-3 py-2"
-        hx-trigger="change"
-      >
-        <option value="">All</option>
-        {% for t in types %}
-          <option value="{{ t }}" {% if selected_type == t %}selected{% endif %}>{{ t|capfirst }}</option>
-        {% endfor %}
-      </select>
-    </div>
-  </form>
 
   <!-- Transaction Table and Pagination -->
   <div id="transaction-table-container" class="overflow-x-auto">
