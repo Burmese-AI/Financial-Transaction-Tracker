@@ -19,18 +19,35 @@
     <form
       id="transaction-filters"
       hx-get="{% url 'dashboard' %}"
-      hx-trigger="change delay:200ms"
+      hx-trigger="change delay:200ms, keyup delay:400ms from:input"
       hx-target="#transaction-table-container"
       hx-swap="innerHTML"
       class="flex flex-wrap gap-4 items-end"
     >
+      <div class="relative flex flex-col justify-end">
+        <input
+          type="text"
+          id="search"
+          name="search"
+          value="{{ request.GET.search|default_if_none:'' }}"
+          class="block w-50 rounded-md border border-stone-300 bg-white shadow-sm focus:border-amber-500 focus:ring-amber-500 text-base pl-10 py-2 transition placeholder-stone-400 placeholder:text-xs"
+          placeholder="Search name or description"
+          autocomplete="off"
+          style="height: 42px;"
+        />
+        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-300 pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </span>
+      </div>
       <div>
         <label for="category" class="block text-xs font-medium text-stone-700 mb-1">Category</label>
         <select
           id="category"
           name="category"
           class="block w-40 rounded-md border-stone-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm"
-          hx-trigger="change"
         >
           <option value="">All</option>
           {% for category in categories %}
@@ -44,7 +61,6 @@
           id="type"
           name="type"
           class="block w-40 rounded-md border-stone-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm"
-          hx-trigger="change"
         >
           <option value="">All</option>
           {% for t in types %}

@@ -4,7 +4,7 @@ from datetime import timedelta, datetime
 from io import TextIOWrapper
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.http import HttpResponse
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,7 +13,6 @@ from django.contrib import messages
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404, render,redirect
 from django.urls import reverse_lazy
-from django.db.models import Q # For combining queries
 from typing import Any
 from .models import Transaction, Category
 from budgets.models import Budget
@@ -29,15 +28,25 @@ class TransactionListView(LoginRequiredMixin, ListView):
     paginate_by = PAGINATION_SIZE
     
     def get_queryset(self):
-        query = Transaction.objects.filter(user=self.request.user)
-        
-        if self.request.GET.get('category'):
-            query = query.filter(category__name__iexact=self.request.GET.get('category'))
-        
-        if self.request.GET.get('type'):
-            query = query.filter(type=self.request.GET.get('type'))
-        
-        # Sorting by amount
+        query = Transaction.objects.filter(user=self.request.user).select_related('category')
+        filters = Q()
+        category = self.request.GET.get('category')
+        type_ = self.request.GET.get('type')
+        search = self.request.GET.get('search')
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
+
+        if category:
+            filters &= Q(category__name__iexact=category)
+        if type_:
+            filters &= Q(type=type_)
+        if search:
+            filters &= Q(name__icontains=search) | Q(description__icontains=search)
+        if start_date and end_date:
+            filters &= Q(created_at__range=[start_date, end_date])
+
+        query = query.filter(filters)
+
         sort_direction = self.request.GET.get('sort_direction', 'desc')
         self.sort_direction_query_param = sort_direction
         query = query.order_by('amount' if sort_direction == 'asc' else '-amount')
