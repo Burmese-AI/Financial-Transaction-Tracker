@@ -14,73 +14,63 @@
     </button>
   </div>
 
-  <div class="flex flex-col lg:flex-row justify-between items-center">
-    <!-- Search Bar, Search Button, and Clear Button -->
-    <div class="mb-4 w-full lg:w-1/2">
-      <form
-        hx-get="{% url 'dashboard' %}"
-        hx-target="#transaction-table-container"
-        hx-swap="innerHTML"
-        class="flex items-center gap-2"
-      >
-        {% csrf_token %}
+  <!-- Filter Form (styled like Budgets) -->
+  <div class="mb-6 flex flex-wrap gap-4 items-end bg-stone-50 p-4 rounded-lg shadow-sm">
+    <form
+      id="transaction-filters"
+      hx-get="{% url 'dashboard' %}"
+      hx-trigger="change delay:200ms, keyup delay:400ms from:input"
+      hx-target="#transaction-table-container"
+      hx-swap="innerHTML"
+      class="flex flex-wrap gap-4 items-end"
+    >
+      <div class="relative flex flex-col justify-end">
         <input
           type="text"
+          id="search"
           name="search"
           value="{{ request.GET.search|default_if_none:'' }}"
-          class="outline-none w-full p-2 text-sm font-medium text-stone-800 placeholder-stone-500 bg-transparent border-b-2 border-stone-300 focus:border-amber-700 hover:border-amber-700 active:border-amber-700 focus:ring-0 transition-colors duration-200"
-          placeholder="Search by name"
-          id="search-input"
+          class="block w-50 rounded-md border border-stone-300 bg-white shadow-sm focus:border-amber-500 focus:ring-amber-500 text-base pl-10 py-2 transition placeholder-stone-400 placeholder:text-xs"
+          placeholder="Search name or description"
+          autocomplete="off"
+          style="height: 42px;"
         />
-        <button
-          type="submit"
-          class="flex items-center px-4 py-2 text-sm font-medium text-stone-700 bg-stone-100 rounded-md shadow-sm transition-all duration-200 hover:bg-stone-200 hover:shadow-md active:bg-stone-300 active:scale-95 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="w-4 h-4 mr-2"
-          >
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-300 pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"/>
           </svg>
-          Search
-        </button>
-        <button
-          type="submit"
-          hx-get="{% url 'dashboard' %}"
-          hx-target="#transaction-table-container"
-          hx-swap="innerHTML"
-          hx-vals='{"page": "1"}'
-          hx-on:click="document.getElementById('search-input').value = ''"
-          class="flex items-center px-4 py-2 text-sm font-medium text-stone-700 bg-stone-100 rounded-md shadow-sm transition-all duration-200 hover:bg-stone-200 hover:shadow-md active:bg-stone-300 active:scale-95 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
-          aria-label="Clear all filters"
+        </span>
+      </div>
+      <div>
+        <label for="category" class="block text-xs font-medium text-stone-700 mb-1">Category</label>
+        <select
+          id="category"
+          name="category"
+          class="block w-40 rounded-md border-stone-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="w-4 h-4 mr-2"
-          >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-          Clear
-        </button>
-      </form>
-    </div>
-
-    <!-- Import, Export Buttons -->
-    <div class="w-fit flex items-center space-x-3">
+          <option value="">All</option>
+          {% for category in categories %}
+            <option value="{{ category.name }}" {% if selected_category == category.name %}selected{% endif %}>{{ category.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="type" class="block text-xs font-medium text-stone-700 mb-1">Type</label>
+        <select
+          id="type"
+          name="type"
+          class="block w-40 rounded-md border-stone-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 text-sm"
+        >
+          <option value="">All</option>
+          {% for t in types %}
+            <option value="{{ t }}" {% if selected_type == t %}selected{% endif %}>{{ t|capfirst }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </form>
+    <!-- Import/Export (right) -->
+    <div class="flex items-center space-x-3 ml-auto">
       <form
         enctype="multipart/form-data"
         method=post
@@ -116,7 +106,6 @@
           />
         </label>
       </form>
-
       <form method="get" action="{% url 'exportcsv' %}">
         {% csrf_token %}
         <button
