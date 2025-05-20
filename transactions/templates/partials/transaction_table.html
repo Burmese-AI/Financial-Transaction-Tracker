@@ -24,6 +24,7 @@
         <div class="flex items-center cursor-pointer">
           <a
             hx-get="{% url 'dashboard' %}?sort_direction={{ sort_direction }}"
+            hx-include="#transaction-filters"
             hx-target="#transaction-table-container"
             hx-swap="innerHTML"
             class="flex items-center hover:text-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
