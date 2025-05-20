@@ -41,7 +41,7 @@ class TransactionListView(LoginRequiredMixin, ListView):
         if type_:
             filters &= Q(type=type_)
         if search:
-            filters &= Q(name__icontains=search) | Q(description__icontains=search)
+            filters &= (Q(name__icontains=search) | Q(description__icontains=search))
         if start_date and end_date:
             filters &= Q(created_at__range=[start_date, end_date])
 
