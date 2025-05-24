@@ -6,7 +6,8 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=100
+    PIP_DEFAULT_TIMEOUT=100 \
+    DJANGO_SETTINGS_MODULE=financial_tracker.settings
 
 # Install system dependencies
 RUN apt-get update \
@@ -20,15 +21,21 @@ RUN apt-get update \
 # Set working directory
 WORKDIR /app
 
-# Install Python dependencies
+# Copy package files first for better caching
+COPY package*.json ./
 COPY pyproject.toml .
+
+# Install Python dependencies
 RUN pip install --no-cache-dir .
 
-# Install Node.js dependencies and build Tailwind CSS
-COPY package*.json ./
+# Install Node.js dependencies
 RUN npm install
-COPY static_src/styles/input.css ./static_src/styles/
-RUN npm run watch:tailwind
+
+# Copy static source files
+COPY static_src/ ./static_src/
+
+# Build Tailwind CSS
+RUN npm run build:tailwind
 
 # Copy project files
 COPY . .
@@ -36,8 +43,11 @@ COPY . .
 # Make entrypoint script executable
 RUN chmod +x /app/entrypoint.sh
 
+# Create static directories
+RUN mkdir -p /app/static /app/staticfiles
+
 # Collect static files
-# RUN python manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput
 
 # Expose port
 EXPOSE 8000

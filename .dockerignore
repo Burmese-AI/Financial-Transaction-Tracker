@@ -53,9 +53,5 @@ docker-compose*.yml
 venv/
 ENV/
 
-# Static files
-static/
-staticfiles/
-
 # Tailwind
 static_src/styles/output.css 
