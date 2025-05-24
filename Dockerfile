@@ -43,10 +43,10 @@ COPY . .
 # Make entrypoint script executable
 RUN chmod +x /app/entrypoint.sh
 
-# Create static directories
-RUN mkdir -p /app/static /app/staticfiles
+# Create staticfiles directory in container
+RUN mkdir -p /app/staticfiles
 
-# Collect static files
+# Collect static files into container's staticfiles directory
 RUN python manage.py collectstatic --noinput
 
 # Expose port

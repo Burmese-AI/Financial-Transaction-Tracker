@@ -26,6 +26,7 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media
+staticfiles/
 
 # Node
 node_modules/
@@ -54,4 +55,4 @@ venv/
 ENV/
 
 # Tailwind
-static_src/styles/output.css 
+static/styles/output.css 
